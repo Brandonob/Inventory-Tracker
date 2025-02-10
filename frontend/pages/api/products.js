@@ -14,8 +14,15 @@ export default async function handler(req, res) {
 
   if (req.method === 'POST') {
     try {
-      const { name, price, description } = req.body;
-      const newProduct = { name, price, description };
+      const { name, description, price, quantity, image } = req.body;
+      const newProduct = {
+        name,
+        description,
+        price,
+        quantity,
+        image,
+        createdAt: new Date(),
+      };
       await db.collection('products').insertOne(newProduct);
       res.status(201).json({ message: 'Product added successfully' });
     } catch (error) {

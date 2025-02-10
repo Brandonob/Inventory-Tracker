@@ -21,13 +21,13 @@ export default function Login() {
     // console.log('Login Data:', formData);
     // Handle login logic here
     const user = { userName: userName, password: password };
-    const formData = new FormData();
-    formData.append('user', user);
+    // const formData = new FormData();
+    // formData.append('user', user);
 
     const response = await fetch('/api/users', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(user),
     });
