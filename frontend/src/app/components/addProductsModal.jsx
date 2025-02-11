@@ -39,44 +39,42 @@ export const AddProductsModal = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log('Submitted Data:', formData);
 
-    //Start Code goes here
+    // Convert image file to Base64
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(image);
 
-    const product = {
-      name: name,
-      description: description,
-      price: price,
-      quantity: quantity,
-      image: image,
+    fileReader.onload = async () => {
+      const base64Image = fileReader.result;
+
+      const product = {
+        name,
+        description,
+        price,
+        quantity,
+        image: base64Image, // Send Base64 string instead of File object
+      };
+
+      const response = await fetch('/api/products', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(product),
+      });
+
+      if (response.ok) {
+        console.log('product created!');
+      } else {
+        const errorData = await response.json();
+        console.log('Error creating product:', errorData);
+      }
+      onClose();
     };
-    // const formData = new FormData();
-    // formData.append('name', formData.name);
-    // formData.append('description', formData.description);
-    // formData.append('price', formData.price);
-    // formData.append('quantity', formData.quantity);
-    // formData.append('image', formData.image);
-
-    const response = await fetch('/api/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(product),
-    });
-
-    if (response.ok) {
-      console.log('product created!');
-    } else {
-      const errorData = await response.json();
-      console.log('Error creating product:', errorData);
-    }
-    //End Code goes here
-    onClose();
   };
   return (
     <>
-      <Button onClick={onOpen} colorScheme='blue'>
+      <Button onClick={onOpen} colorScheme='blue' className='w-28'>
         Add Item
       </Button>
 

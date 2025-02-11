@@ -1,5 +1,6 @@
 // import React from 'react'
-import { Box, Image, Text, Button, VStack } from '@chakra-ui/react';
+import { Box, Text, Button, VStack } from '@chakra-ui/react';
+import Image from 'next/image';
 
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
@@ -13,9 +14,19 @@ export const ProductCard = ({ product }) => {
       p={4}
       bg='white'
       _hover={{ boxShadow: 'xl' }}
-      className='w-80 h-80'
+      className='w-80 h-[365px]'
     >
-      <Image src={product.image} alt={product.name} borderRadius='md' />
+      {console.log('product card!', product)}
+      {product.image && (
+        <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+          <Image
+            src={product.image}
+            alt={product.name}
+            fill
+            style={{ objectFit: 'cover' }}
+          />
+        </div>
+      )}
       <VStack align='start' spacing={2} mt={3}>
         <Text fontSize='xl' fontWeight='bold'>
           {product.name}
