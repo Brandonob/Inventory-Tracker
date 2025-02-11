@@ -15,7 +15,7 @@ export default function Home() {
     getAllProducts().then((products) => {
       setProducts(products);
     });
-  }, []);
+  }, [products]);
 
   const productsInStock = products.filter((product) => product.quantity > 0);
 
