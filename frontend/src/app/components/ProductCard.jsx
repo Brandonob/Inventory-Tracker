@@ -29,17 +29,16 @@ export const ProductCard = ({ product }) => {
       )}
       <VStack align='start' spacing={2} mt={3}>
         <Text fontSize='xl' fontWeight='bold'>
-          {product.name}
+          {`${product.name} - ${product.description}`}
         </Text>
-        <Text fontSize='md' color='gray.600'>
-          {product.description}
-        </Text>
-        <Text fontSize='lg' fontWeight='semibold' color='teal.500'>
-          ${product.price}
-        </Text>
-        <Text fontSize='lg' fontWeight='semibold' color='teal.500'>
-          {product.quantity} in stock
-        </Text>
+        <div className='flex justify-between w-full'>
+          <Text fontSize='lg' fontWeight='semibold' color='teal.500'>
+            ${product.price}
+          </Text>
+          <Text fontSize='lg' fontWeight='semibold' color='teal.500'>
+            {product.quantity} in stock
+          </Text>
+        </div>
         <EditProductModal product={product} />
       </VStack>
     </Box>

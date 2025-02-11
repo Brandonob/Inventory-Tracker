@@ -14,7 +14,10 @@ import {
   Textarea,
   NumberInput,
   NumberInputField,
+  useDisclosure,
+  IconButton,
 } from '@chakra-ui/react';
+import { TiEdit } from 'react-icons/ti';
 
 export const EditProductModal = ({ product }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -62,13 +65,15 @@ export const EditProductModal = ({ product }) => {
   return (
     <>
       {/* edit icon that will open modal */}
-      <IconButton
-        icon={<EditIcon />}
+      <IconButton onClick={onOpen} aria-label='Edit'>
+        <TiEdit />
+      </IconButton>
+      {/* icon={EditIcon}
         aria-label='Edit'
         onClick={onOpen}
         colorScheme='blue'
-        className='w-28'
-      />
+        className='w-28' */}
+
       {/* <Button onClick={onOpen} colorScheme='blue' className='w-28'>
         Add Item
       </Button> */}

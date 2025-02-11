@@ -12,10 +12,18 @@ export default function Home() {
 
   useEffect(() => {
     //request to get all products
-    getAllProducts().then((products) => {
+    fetchProducts();
+  }, []);
+
+  const fetchProducts = async () => {
+    try {
+      const products = await getAllProducts();
       setProducts(products);
-    });
-  }, [products]);
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setProducts([]); // Set empty array as fallback
+    }
+  };
 
   const productsInStock = products.filter((product) => product.quantity > 0);
 
