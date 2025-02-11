@@ -1,7 +1,7 @@
 // import React from 'react'
 import { Box, Text, Button, VStack } from '@chakra-ui/react';
 import Image from 'next/image';
-
+import { EditProductModal } from './EditProductModal';
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
 
@@ -40,9 +40,7 @@ export const ProductCard = ({ product }) => {
         <Text fontSize='lg' fontWeight='semibold' color='teal.500'>
           {product.quantity} in stock
         </Text>
-        {/* <Button colorScheme='teal' size='sm'>
-          Add to Cart
-        </Button> */}
+        <EditProductModal product={product} />
       </VStack>
     </Box>
   );
