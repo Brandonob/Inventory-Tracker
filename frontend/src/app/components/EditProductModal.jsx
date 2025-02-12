@@ -16,6 +16,7 @@ import {
   NumberInputField,
   useDisclosure,
   IconButton,
+  useToast,
 } from '@chakra-ui/react';
 import { TiEdit } from 'react-icons/ti';
 
@@ -26,57 +27,73 @@ export const EditProductModal = ({ product }) => {
   const [price, setPrice] = useState(product.price);
   const [quantity, setQuantity] = useState(product.quantity);
   const [image, setImage] = useState(product.image);
+  const toast = useToast();
+
+  // Helper function to update the product
+  const updateProduct = async (imageData) => {
+    const updatedProduct = {
+      id: product._id,
+      name,
+      description,
+      price,
+      quantity,
+      image: imageData,
+    };
+
+    console.log('>>>>>updatedProduct<<<<<', updatedProduct);
+
+    const response = await fetch(`/api/products/${product._id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updatedProduct),
+    });
+
+    if (response.ok) {
+      console.log('product updated!');
+      toast({
+        title: 'Product updated!',
+        description: 'Product updated successfully',
+        status: 'success',
+        duration: 3000,
+        isClosable: true,
+      });
+    } else {
+      const errorData = await response.json();
+      console.log('Error updating product:', errorData);
+      toast({
+        title: 'Error updating product!',
+        description: 'Product update failed',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+    onClose();
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+    // If image is a File object, convert to base64
+    if (image instanceof File) {
+      const fileReader = new FileReader();
+      fileReader.readAsDataURL(image);
 
-    // Convert image file to Base64
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(image);
-
-    fileReader.onload = async () => {
-      const base64Image = fileReader.result;
-
-      const product = {
-        name,
-        description,
-        price,
-        quantity,
-        image: base64Image, // Send Base64 string instead of File object
+      fileReader.onload = async () => {
+        await updateProduct(fileReader.result);
       };
-
-      const response = await fetch('/api/products', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(product),
-      });
-
-      if (response.ok) {
-        console.log('product created!');
-      } else {
-        const errorData = await response.json();
-        console.log('Error creating product:', errorData);
-      }
-      onClose();
-    };
+    } else {
+      // Image is already a base64 string or null
+      await updateProduct(image);
+    }
   };
+
   return (
     <>
       {/* edit icon that will open modal */}
       <IconButton onClick={onOpen} aria-label='Edit'>
         <TiEdit />
       </IconButton>
-      {/* icon={EditIcon}
-        aria-label='Edit'
-        onClick={onOpen}
-        colorScheme='blue'
-        className='w-28' */}
-
-      {/* <Button onClick={onOpen} colorScheme='blue' className='w-28'>
-        Add Item
-      </Button> */}
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
@@ -108,7 +125,7 @@ export const EditProductModal = ({ product }) => {
 
               <FormControl mb={4}>
                 <FormLabel>Price</FormLabel>
-                <NumberInput defaultValue={0} min={0}>
+                <NumberInput defaultValue={product.price} min={0}>
                   <NumberInputField
                     name='price'
                     value={price}
@@ -119,7 +136,7 @@ export const EditProductModal = ({ product }) => {
 
               <FormControl mb={4}>
                 <FormLabel>Quantity</FormLabel>
-                <NumberInput defaultValue={0} min={0}>
+                <NumberInput defaultValue={product.quantity} min={0}>
                   <NumberInputField
                     name='quantity'
                     value={quantity}

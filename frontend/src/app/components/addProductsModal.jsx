@@ -29,9 +29,8 @@ export const AddProductsModal = () => {
   const [quantity, setQuantity] = useState(0);
   const [image, setImage] = useState([]);
   const toast = useToast();
-  const handleSubmit = async (e) => {
-    e.preventDefault();
 
+  const handleSubmit = async (e) => {
     // Convert image file to Base64
     const fileReader = new FileReader();
     fileReader.readAsDataURL(image);
@@ -78,6 +77,7 @@ export const AddProductsModal = () => {
       onClose();
     };
   };
+
   return (
     <>
       <Button onClick={onOpen} colorScheme='blue' className='w-28'>

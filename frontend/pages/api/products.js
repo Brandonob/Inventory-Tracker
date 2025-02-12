@@ -30,22 +30,32 @@ export default async function handler(req, res) {
     }
   }
   //Update Product
-  if (req.method === 'PUT') {
-    try {
-      const { id, name, description, price, quantity, image } = req.body;
-      const updatedProduct = {
-        name,
-        description,
-        price,
-        quantity,
-        image,
-      };
-      await db
-        .collection('products')
-        .updateOne({ _id: new ObjectId(id) }, { $set: updatedProduct });
-      res.status(200).json({ message: 'Product updated successfully' });
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to update product' });
-    }
-  }
+  // if (req.method === 'PUT') {
+  //   try {
+  //     const { id, name, description, price, quantity, image } = req.body;
+
+  //     const product = await db
+  //       .collection('products')
+  //       .findOne({ _id: new ObjectId(id) });
+
+  //     if (!product) {
+  //       return res.status(404).json({ error: 'Product not found' });
+  //     }
+
+  //     const updatedProduct = {
+  //       name,
+  //       description,
+  //       price,
+  //       quantity,
+  //       image,
+  //     };
+
+  //     await db
+  //       .collection('products')
+  //       .updateOne({ _id: new ObjectId(id) }, { $set: updatedProduct });
+  //     res.status(200).json({ message: 'Product updated successfully' });
+  //   } catch (error) {
+  //     res.status(500).json({ error: 'Failed to update product' });
+  //   }
+  // }
 }
