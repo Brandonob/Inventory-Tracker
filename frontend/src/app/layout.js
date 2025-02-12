@@ -2,7 +2,7 @@
 import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
-
+import ReduxProvider from './redux/provider';
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -24,7 +24,9 @@ export default function RootLayout({ children }) {
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <ChakraProvider>{children}</ChakraProvider>
+        <ReduxProvider>
+          <ChakraProvider>{children}</ChakraProvider>
+        </ReduxProvider>
       </body>
     </html>
   );
