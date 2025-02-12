@@ -1,9 +1,38 @@
 // import React from 'react'
-import { Box, Text, Button, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Text,
+  Button,
+  VStack,
+  IconButton,
+  useToast,
+  // useTooltip,
+  Tooltip,
+} from '@chakra-ui/react';
 import Image from 'next/image';
 import { EditProductModal } from './EditProductModal';
+import { FaCartPlus } from 'react-icons/fa';
+import { addToCart } from '../redux/slices/cartSlice';
+import { useDispatch } from 'react-redux';
+// import { Tooltip } from '../../components/ui/tooltip';
+
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
+  const dispatch = useDispatch();
+  const toast = useToast();
+  // const tooltip = useTooltip();
+
+  const handleAddToCart = (product) => {
+    //Send to RTK and return succes toast
+    dispatch(addToCart(product));
+    toast({
+      title: 'Product added to cart!',
+      description: 'You can view your cart in the cart page',
+      status: 'success',
+      duration: 3000,
+      isClosable: true,
+    });
+  };
 
   return (
     <Box
@@ -39,7 +68,18 @@ export const ProductCard = ({ product }) => {
             {product.quantity} in stock
           </Text>
         </div>
-        <EditProductModal product={product} />
+        <div className='flex justify-between w-full'>
+          <EditProductModal product={product} />
+
+          <Tooltip label='Add to cart' placement='left'>
+            <IconButton
+              onClick={() => handleAddToCart(product)}
+              aria-label='Add to cart'
+            >
+              <FaCartPlus />
+            </IconButton>
+          </Tooltip>
+        </div>
       </VStack>
     </Box>
   );

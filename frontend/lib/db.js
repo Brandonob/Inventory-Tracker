@@ -12,7 +12,6 @@ if (!MONGODB_URI || !MONGODB_DB) {
 console.log('>>>>>>>MONGO DB URI<<<<<<<<', MONGODB_URI);
 console.log('>>>>>>>MONGO DB DB<<<<<<<<', MONGODB_DB);
 
-
 export async function connectToDB() {
   try {
     // if (cachedClient && cachedDb) {
@@ -25,12 +24,12 @@ export async function connectToDB() {
         strict: true,
         deprecationErrors: true,
       },
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
+      // useNewUrlParser: true,
+      // useUnifiedTopology: true,
     });
     // debugger;
     await client.connect();
-    
+
     console.log('>>>>>>>>>>Connected to DB<<<<<<<<<<');
     const db = client.db(MONGODB_DB);
 
@@ -43,10 +42,3 @@ export async function connectToDB() {
     console.log(error.message);
   }
 }
-
-// export async function getCollection(collectionName) {
-//   const db = await connectToDB(MONGODB_DB);
-//   if (db) return db.collection(collectionName);
-
-//   return null;
-// }

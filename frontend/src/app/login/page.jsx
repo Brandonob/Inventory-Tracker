@@ -10,22 +10,22 @@ import {
   VStack,
   Heading,
 } from '@chakra-ui/react';
+import { useDispatch } from 'react-redux';
+import { setUser } from '../redux/slices/usersSlice';
 
 export default function Login() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
+  const dispatch = useDispatch();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     debugger;
-    // console.log('Login Data:', formData);
-    // Handle login logic here
-    const user = { userName: userName, password: password };
-    // const formData = new FormData();
-    // formData.append('user', user);
 
-    const response = await fetch('/api/users', {
-      method: 'POST',
+    const user = { userName, password };
+
+    const response = await fetch('/api/login', {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -33,10 +33,11 @@ export default function Login() {
     });
 
     if (response.ok) {
-      console.log('user created!');
+      console.log('user logged in!');
+      dispatch(setUser(user));
     } else {
       const errorData = await response.json();
-      console.log('Error creating user:', errorData);
+      console.log('Error logging in user:', errorData);
     }
   };
 

@@ -17,6 +17,7 @@ import {
   useDisclosure,
   IconButton,
   useToast,
+  Tooltip,
 } from '@chakra-ui/react';
 import { TiEdit } from 'react-icons/ti';
 
@@ -91,9 +92,11 @@ export const EditProductModal = ({ product }) => {
   return (
     <>
       {/* edit icon that will open modal */}
-      <IconButton onClick={onOpen} aria-label='Edit'>
-        <TiEdit />
-      </IconButton>
+      <Tooltip label='Edit product' placement='right'>
+        <IconButton onClick={onOpen} aria-label='Edit'>
+          <TiEdit />
+        </IconButton>
+      </Tooltip>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
