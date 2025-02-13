@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  products: [],
+  allProducts: [],
 };
 
 const productsSlice = createSlice({
@@ -9,18 +9,27 @@ const productsSlice = createSlice({
   initialState,
   reducers: {
     setProducts: (state, action) => {
-      state.products = action.payload;
+      state.allProducts = action.payload;
     },
     addProduct: (state, action) => {
-      state.products.push(action.payload);
+      state.allProducts.push(action.payload);
     },
     updateProduct: (state, action) => {
-      state.products = state.products.map((product) =>
+      state.allProducts = state.allProducts.map((product) =>
         product._id === action.payload._id ? action.payload : product
       );
     },
   },
 });
+
+export const fetchProducts = () => async (dispatch) => {
+  try {
+    const products = await getAllProducts();
+    products ? dispatch(setProducts(products)) : dispatch(setProducts([]));
+  } catch (error) {
+    console.error('Error fetching products:', error);
+  }
+};
 
 export const { setProducts, addProduct, updateProduct } = productsSlice.actions;
 export default productsSlice.reducer;

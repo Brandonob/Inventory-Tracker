@@ -12,7 +12,7 @@ import {
 import Image from 'next/image';
 import { EditProductModal } from './EditProductModal';
 import { FaCartPlus } from 'react-icons/fa';
-import { addToCart } from '../redux/slices/cartSlice';
+import { addToCart } from '../redux/slices/cartsSlice';
 import { useDispatch } from 'react-redux';
 // import { Tooltip } from '../../components/ui/tooltip';
 

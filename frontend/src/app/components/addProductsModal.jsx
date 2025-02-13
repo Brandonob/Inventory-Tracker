@@ -31,6 +31,7 @@ export const AddProductsModal = () => {
   const toast = useToast();
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     // Convert image file to Base64
     const fileReader = new FileReader();
     fileReader.readAsDataURL(image);

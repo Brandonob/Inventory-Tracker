@@ -2,12 +2,14 @@
 import { useEffect, useState } from 'react';
 import { AddProductsModal } from './components/AddProductsModal';
 import { ProductCard } from './components/ProductCard';
-import { getAllProducts } from './utils/dbHelpers';
+// import { getAllProducts } from './utils/dbHelpers';
+import { fetchProducts } from './redux/slices/productsSlice';
+import { useSelector } from 'react-redux';
 import Image from 'next/image';
 import pookieIcon from './components/media/pookieIcon.png';
 
 export default function Home() {
-  const [products, setProducts] = useState([]);
+  const products = useSelector((state) => state.products.allProducts);
   console.log('PRODUCTS', products);
 
   useEffect(() => {
@@ -15,15 +17,15 @@ export default function Home() {
     fetchProducts();
   }, []);
 
-  const fetchProducts = async () => {
-    try {
-      const products = await getAllProducts();
-      setProducts(products);
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setProducts([]); // Set empty array as fallback
-    }
-  };
+  // const fetchProducts = async () => {
+  //   try {
+  //     const products = await getAllProducts();
+  //     setProducts(products);
+  //   } catch (error) {
+  //     console.error('Error fetching products:', error);
+  //     setProducts([]); // Set empty array as fallback
+  //   }
+  // };
 
   const productsInStock = products.filter((product) => product.quantity > 0);
 

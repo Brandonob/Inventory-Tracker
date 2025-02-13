@@ -75,6 +75,7 @@ export const EditProductModal = ({ product }) => {
   };
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
     // If image is a File object, convert to base64
     if (image instanceof File) {
       const fileReader = new FileReader();

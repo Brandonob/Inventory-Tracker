@@ -2,7 +2,7 @@
 import React from 'react';
 import { Box, Text, VStack, HStack, Image, IconButton } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
-import { removeFromCart } from '../redux/slices/cartSlice';
+import { removeFromCart } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function Cart() {

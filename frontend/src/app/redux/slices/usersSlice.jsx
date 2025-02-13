@@ -1,26 +1,26 @@
 import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
-  users: [],
+  allUsers: [],
 };
 
 const usersSlice = createSlice({
   name: 'users',
   initialState,
   reducers: {
-    setUser: (state, action) => {
-      state.users = action.payload;
+    setUsers: (state, action) => {
+      state.allUsers = action.payload;
     },
     addUser: (state, action) => {
-      state.users.push(action.payload);
+      state.allUsers.push(action.payload);
     },
     updateUser: (state, action) => {
-      state.users = state.users.map((user) =>
+      state.allUsers = state.allUsers.map((user) =>
         user._id === action.payload._id ? action.payload : user
       );
     },
   },
 });
 
-export const { setUser, addUser, updateUser } = usersSlice.actions;
+export const { setUsers, addUser, updateUser } = usersSlice.actions;
 export default usersSlice.reducer;
