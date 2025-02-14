@@ -31,12 +31,24 @@ export async function GET() {
 export async function POST(req) {
   try {
     const db = await getDB();
-    const { name, description, price, quantity, image } = req.body;
+    debugger;
+    const body = await req.json();
+    const { name, description, price, quantity, image } = body;
+
+    // Validate the data
+    //require name, price, quantity
+    // if (!name || !description || !price || !quantity) {
+    //   return NextResponse.json(
+    //     { error: 'Missing required fields' },
+    //     { status: 400 }
+    //   );
+    // }
+
     const newProduct = {
       name,
       description,
-      price,
-      quantity,
+      price: Number(price),
+      quantity: Number(quantity),
       image,
       createdAt: new Date(),
     };

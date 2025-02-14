@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
-import { connectToDB } from '../../../../lib/db';
+import { getDB } from '../../../../lib/db';
 
 export async function GET() {
   try {
-    const client = await connectToDB();
-    const db = client.db(process.env.MONGODB_DB);
+    const db = await getDB();
 
     await db.admin().ping(); // Test the connection
     return NextResponse.json({ status: 'connected' });

@@ -1,10 +1,10 @@
 import { MongoClient } from 'mongodb';
-import {
-  setToConnecting,
-  setToConnected,
-  setToDisconnected,
-  setError,
-} from '../src/app/redux/slices/databaseSlice';
+// import {
+//   setToConnecting,
+//   setToConnected,
+//   setToDisconnected,
+//   setError,
+// } from '../src/app/redux/slices/databaseSlice';
 
 const { MONGODB_DB, MONGODB_URI } = process.env;
 
@@ -115,7 +115,11 @@ export async function connectToDB() {
   // }
 }
 export async function getDB() {
-  const client = await connectToDB();
+  try {
+    const client = await connectToDB();
 
-  return client.db(MONGODB_DB);
+    return client.db(MONGODB_DB);
+  } catch (error) {
+    console.error('MongoDB connection error:', error);
+  }
 }
