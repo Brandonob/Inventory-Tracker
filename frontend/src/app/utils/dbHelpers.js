@@ -7,6 +7,7 @@ const getUserByUserName = () => {};
 //Products
 const getAllProducts = async () => {
   try {
+    debugger;
     const response = await fetch('/api/products', {
       method: 'GET',
       headers: {

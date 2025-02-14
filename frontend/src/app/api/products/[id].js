@@ -1,6 +1,6 @@
-import { connectToDB } from '../../../lib/db';
+import { connectToDB } from '../../../../lib/db';
 import { ObjectId } from 'mongodb';
-
+import { store } from '../../redux/store';
 export default async function handler(req, res) {
   const { db } = await connectToDB();
   const { id } = req.query; // Get the ID from the URL
