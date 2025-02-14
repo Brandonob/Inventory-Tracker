@@ -6,15 +6,14 @@ import {
   VStack,
   IconButton,
   useToast,
-  // useTooltip,
   Tooltip,
 } from '@chakra-ui/react';
 import Image from 'next/image';
 import { EditProductModal } from './EditProductModal';
 import { FaCartPlus } from 'react-icons/fa';
+import { MdOutlineImageNotSupported } from 'react-icons/md';
 import { addToCart } from '../redux/slices/cartsSlice';
 import { useDispatch } from 'react-redux';
-// import { Tooltip } from '../../components/ui/tooltip';
 
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
@@ -46,14 +45,19 @@ export const ProductCard = ({ product }) => {
       className='w-80 h-[365px]'
     >
       {console.log('product card!', product)}
-      {product.image && (
-        <div style={{ position: 'relative', width: '100%', height: '200px' }}>
+      {product.image ? (
+        <div className='relative w-full h-[200px]'>
           <Image
             src={product.image}
             alt={product.name}
             fill
             style={{ objectFit: 'cover' }}
           />
+        </div>
+      ) : (
+        <div className='w-full h-[200px] flex flex-col items-center justify-center'>
+          <MdOutlineImageNotSupported size={100} />
+          <Text>No image available</Text>
         </div>
       )}
       <VStack align='start' spacing={2} mt={3}>
