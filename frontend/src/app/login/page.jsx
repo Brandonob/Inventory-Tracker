@@ -12,20 +12,22 @@ import {
 } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/slices/usersSlice';
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
-
+  const router = useRouter();
   const handleSubmit = async (e) => {
     e.preventDefault();
-    debugger;
+    // debugger;
 
     const user = { userName, password };
+    console.log('Sending login request with:', user);
 
     const response = await fetch('/api/login', {
-      method: 'GET',
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
@@ -33,8 +35,10 @@ export default function Login() {
     });
 
     if (response.ok) {
-      console.log('user logged in!');
-      dispatch(setUser(user));
+      const data = await response.json();
+      console.log('user logged in!', data);
+      dispatch(setUser(data));
+      router.push('/');
     } else {
       const errorData = await response.json();
       console.log('Error logging in user:', errorData);
