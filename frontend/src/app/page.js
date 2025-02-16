@@ -35,24 +35,27 @@ export default function Home() {
   // };
 
   const productsInStock = allProducts.filter((product) => product.quantity > 0);
+  console.log('PRODUCTS IN STOCK', productsInStock);
 
   // const getAllProductsInStock
   return (
-    <div className='flex flex-col items-center justify-center bg-black'>
+    <>
       <InitializeDB />
-      <div className='flex items-center justify-center'>
-        <Image src={pookieIcon} alt='logo' width={300} height={300} />
-      </div>
-      <div className='flex flex-col w-3/4 '>
-        <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+      <div className='flex flex-col items-center justify-center bg-black'>
+        <div className='flex items-center justify-center'>
+          <Image src={pookieIcon} alt='logo' width={300} height={300} />
+        </div>
+        <div className='flex flex-col w-3/4 '>
+          <h1 className='text-4xl font-bold text-white'>In Stock</h1>
 
-        <AddProductsModal />
-        <div className='flex flex-wrap gap-4 justify-center mt-12'>
-          {productsInStock.map((product) => (
-            <ProductCard key={product._id} product={product} />
-          ))}
+          <AddProductsModal />
+          <div className='flex flex-wrap gap-4 justify-center mt-12'>
+            {productsInStock.map((product) => (
+              <ProductCard key={product._id} product={product} />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

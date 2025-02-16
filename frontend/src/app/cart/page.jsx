@@ -2,12 +2,13 @@
 import React from 'react';
 import { Box, Text, VStack, HStack, Image, IconButton } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
-import { removeFromCart } from '../redux/slices/cartsSlice';
+import { removeProductFromActiveCart } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function Cart() {
   const dispatch = useDispatch();
-  const cart = useSelector((state) => state.cart.cart);
+  const carts = useSelector((state) => state.carts.allCarts);
+  const activeCart = useSelector((state) => state.carts.activeCart);
 
   return (
     <Box
@@ -23,12 +24,12 @@ export default function Cart() {
         Shopping Cart
       </Text>
       <VStack spacing={4} align='stretch'>
-        {cart.length === 0 ? (
+        {activeCart.products.length === 0 ? (
           <Text>Your cart is empty</Text>
         ) : (
-          cart.map((product) => (
+          activeCart.products.map((cartItem) => (
             <HStack
-              key={product._id}
+              key={cartItem.product._id}
               p={3}
               borderWidth={1}
               borderRadius='md'
@@ -36,16 +37,18 @@ export default function Cart() {
             >
               <Image
                 boxSize='50px'
-                src={product.image}
-                alt={product.name}
+                src={cartItem.product.image}
+                alt={cartItem.product.name}
                 borderRadius='md'
               />
-              <Text flex={1}>{product.name}</Text>
-              <Text fontWeight='bold'>${product.price}</Text>
+              <Text flex={1}>{cartItem.product.name}</Text>
+              <Text fontWeight='bold'>${cartItem.product.price}</Text>
               <IconButton
                 icon={<FaTrash />}
                 colorScheme='red'
-                onClick={() => removeFromCart(product._id)}
+                onClick={() =>
+                  dispatch(removeProductFromActiveCart(cartItem.product._id))
+                }
                 aria-label='Remove from cart'
               />
             </HStack>
