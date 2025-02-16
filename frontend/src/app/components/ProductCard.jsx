@@ -30,7 +30,8 @@ export const ProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const toast = useToast();
   const state = useSelector((state) => state.carts);
-  const isInActiveCart = isProductInActiveCart(state, product.id);
+  const isInActiveCart = isProductInActiveCart(state, product._id);
+  //check if product is in active cart
   // const tooltip = useTooltip();
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
     useNumberInput({

@@ -21,7 +21,7 @@ const cartsSlice = createSlice({
     },
     removeProductFromActiveCart: (state, action) => {
       state.activeCart.products = state.activeCart.products.filter(
-        (item) => item.product.id !== action.payload
+        (item) => item.product._id !== action.payload
       );
     },
     //add product object to products array in active cart
@@ -49,7 +49,7 @@ const cartsSlice = createSlice({
       //find product in active cart products array and increment the quantity by 1
       const { product: productData } = action.payload;
       const product = state.activeCart.products.find(
-        (product) => product.product.id === productData.id
+        (item) => item.product._id === productData._id
       );
       product.quantity = product.quantity + 1;
     },
@@ -58,7 +58,7 @@ const cartsSlice = createSlice({
 
       const { product: productData } = action.payload;
       const product = state.activeCart.products.find(
-        (product) => product.product.id === productData.id
+        (item) => item.product._id === productData._id
       );
       product.quantity = product.quantity - 1;
     },
@@ -67,11 +67,12 @@ const cartsSlice = createSlice({
 
 //function that returns true if the product is already in the active cart
 export const isProductInActiveCart = (state, productId) => {
-  if (state.activeCart === undefined) {
+  if (state.activeCart.products.length === 0) {
     return false;
   }
+
   const product = state.activeCart.products.find(
-    (product) => product.product.id === productId
+    (item) => item.product._id === productId
   );
   return product ? true : false;
 };
