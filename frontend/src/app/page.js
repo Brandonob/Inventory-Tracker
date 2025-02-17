@@ -2,14 +2,12 @@
 import { useEffect, useState } from 'react';
 import { AddProductsModal } from './components/AddProductsModal';
 import { ProductCard } from './components/ProductCard';
-// import { getAllProducts } from './utils/dbHelpers';
 import { fetchAllProducts } from './redux/slices/productsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import pookieIcon from './components/media/pookieIcon.png';
 import { InitializeDB } from './utils/InitializeDB';
-// import { connectToDB } from '../../lib/db';
-// import { store } from './redux/store';
+import { SaveCartButton } from './components/SaveCartButton';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -47,8 +45,8 @@ export default function Home() {
         </div>
         <div className='flex flex-col w-3/4 '>
           <h1 className='text-4xl font-bold text-white'>In Stock</h1>
-
           <AddProductsModal />
+          <SaveCartButton />
           <div className='flex flex-wrap gap-4 justify-center mt-12'>
             {productsInStock.map((product) => (
               <ProductCard key={product._id} product={product} />
