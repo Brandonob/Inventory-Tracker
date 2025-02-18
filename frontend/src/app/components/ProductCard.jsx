@@ -22,6 +22,7 @@ import {
   incrementCartItemQuantity,
   decrementCartItemQuantity,
   isProductInActiveCart,
+  setActiveCartId,
 } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -31,6 +32,8 @@ export const ProductCard = ({ product }) => {
   const toast = useToast();
   const state = useSelector((state) => state.carts);
   const isInActiveCart = isProductInActiveCart(state, product._id);
+  const activeCart = useSelector((state) => state.carts.activeCart);
+  const activeCartId = useSelector((state) => state.carts.activeCartId);
   //check if product is in active cart
   // const tooltip = useTooltip();
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
@@ -46,13 +49,40 @@ export const ProductCard = ({ product }) => {
   const decrement = getDecrementButtonProps();
   const input = getInputProps();
 
-  const handleAddToActiveCart = (product) => {
+  const createNewCartGetId = async () => {
+    try {
+      const newCart = await fetch('/api/carts', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const newCartData = await newCart.json();
+      return newCartData.insertedId;
+    } catch (error) {
+      console.log('ERROR IN CREATE NEW CART GET ID', error.message);
+    }
+  };
+
+  const handleAddToActiveCart = async (product) => {
     debugger;
     //Send to RTK and return succes toast
     //if active cart is empty, set the product to the active cart
-    if (state.activeCart.products.length === 0) {
+    const activeCartLength = activeCart.products.length;
+    // const activeCartId = state.activeCartId;
+
+    if (activeCartLength === 0 && activeCartId === null) {
+      //Post new cart to db and get the id
+      //set the id to the active cart id
+      //add the product to the active cart
+      const newCartId = await createNewCartGetId();
+      console.log('NEW CART ID', newCartId);
+      //set active cart id in redux
+      dispatch(setActiveCartId(newCartId));
+      //add the product to the active cart in redux
       dispatch(setActiveCart({ product, quantity: 1 }));
     } else {
+      //add the product to the active cart in redux
       dispatch(addProductToActiveCart({ product, quantity: 1 }));
     }
 
