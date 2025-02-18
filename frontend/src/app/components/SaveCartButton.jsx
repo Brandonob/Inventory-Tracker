@@ -8,7 +8,7 @@ export const SaveCartButton = ({ activeCart, cartId }) => {
   const getActiveCartData = () => {
     const data = [];
     activeCart.products.forEach((product) => {
-      debugger;
+      //   debugger;
       data.push({
         productId: product.product._id,
         quantity: product.quantity,
@@ -19,7 +19,7 @@ export const SaveCartButton = ({ activeCart, cartId }) => {
 
   const handleSaveCart = async (e) => {
     e.preventDefault();
-    debugger;
+    // debugger;
     try {
       const activeCartData = await getActiveCartData();
       //update cart in database to store activeCart
