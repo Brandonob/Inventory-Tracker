@@ -8,8 +8,8 @@ import Image from 'next/image';
 import pookieIcon from './components/media/pookieIcon.png';
 import { InitializeDB } from './utils/InitializeDB';
 import { SaveCartButton } from './components/SaveCartButton';
-import { IoBagCheckOutline } from 'react-icons/io5';
-import { IconButton } from '@chakra-ui/react';
+import { CartPreviewModal } from './components/CartPreviewModal';
+import { NavMenu } from './components/NavMenu';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -57,14 +57,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <div className='fixed bottom-0 right-0 m-4'>
-          <IconButton
-            className='!bg-gray-400 !rounded-[20px] '
-            aria-label='Save Cart'
-          >
-            <IoBagCheckOutline className='hover:text-yellow-400 text-white text-4xl h-[30px] w-[30px] ' />
-          </IconButton>
-        </div>
+        <CartPreviewModal activeCart={activeCart} />
+        <NavMenu />
       </div>
     </>
   );
