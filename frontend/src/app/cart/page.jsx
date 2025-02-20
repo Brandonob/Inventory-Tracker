@@ -1,14 +1,34 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Box, Text, VStack, HStack, Image, IconButton } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
-import { removeProductFromActiveCart } from '../redux/slices/cartsSlice';
+import {
+  removeProductFromActiveCart,
+  setAllCarts,
+  setActiveCart,
+} from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function Cart() {
   const dispatch = useDispatch();
   const carts = useSelector((state) => state.carts.allCarts);
   const activeCart = useSelector((state) => state.carts.activeCart);
+  //on page load grab all carts from the database
+  useEffect(() => {
+    const fetchCarts = async () => {
+      const carts = await getCarts();
+      dispatch(setAllCarts(carts));
+    };
+    fetchCarts();
+  }, []);
+
+  // const getActiveCart = (carts) => {
+  //   dispatch(setActiveCart(cartId));
+  // };
+
+  //get the active cart from the allCarts RTK state
+  //add isActive to carts collection
+  //set the active cart to the cart with isActive true
 
   return (
     <Box

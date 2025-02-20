@@ -8,7 +8,7 @@ import Image from 'next/image';
 import pookieIcon from './components/media/pookieIcon.png';
 import { InitializeDB } from './utils/InitializeDB';
 import { SaveCartButton } from './components/SaveCartButton';
-import { CartPreviewModal } from './components/CartPreviewModal';
+import { CartModal } from './components/CartModal';
 import { NavMenu } from './components/NavMenu';
 
 export default function Home() {
@@ -57,7 +57,8 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <CartPreviewModal activeCart={activeCart} />
+        <CartModal activeCart={activeCart} />
+        {/* <CartPreviewModal activeCart={activeCart} /> */}
         <NavMenu />
       </div>
     </>
