@@ -24,7 +24,7 @@ export default function Home() {
     // <InitializeDB />;
     //request to get all products
     dispatch(fetchAllProducts());
-  }, []);
+  }, [activeCart.products]);
 
   // const fetchProducts = async () => {
   //   try {

@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { IoBagCheckOutline } from 'react-icons/io5';
 import { FaTrash } from 'react-icons/fa';
 import { useDispatch } from 'react-redux';
+import { PurchaseModal } from './PurchaseModal';
 import { removeProductFromActiveCart } from '../redux/slices/cartsSlice';
 
 import {
@@ -19,11 +20,27 @@ import {
   MenuList,
   useDisclosure,
   Button,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  ModalCloseButton,
+  Slide,
+  Box,
 } from '@chakra-ui/react';
+import { QuantitySelector } from './QuantitySelector';
 
 export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const [showPurchase, setShowPurchase] = useState(false);
   const dispatch = useDispatch();
+
+  const handlePurchaseClick = () => {
+    setShowPurchase(true);
+  };
+
+  const handleBackToCart = () => {
+    setShowPurchase(false);
+  };
 
   return (
     <>
@@ -49,44 +66,76 @@ export const CartModal = ({ activeCart }) => {
       {/* Add Item */}
       {/* </Button> */}
 
-      <Modal isOpen={isOpen} onClose={onClose}>
+      <Modal size='xl' isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
         <ModalContent>
-          <VStack spacing={4} align='stretch'>
-            {activeCart.products.length === 0 ? (
-              <Text>Your cart is empty</Text>
-            ) : (
-              activeCart.products.map((cartItem) => (
-                <HStack
-                  key={cartItem.product._id}
-                  p={3}
-                  borderWidth={1}
-                  borderRadius='md'
-                  justifyContent='space-between'
-                >
-                  <Image
-                    boxSize='50px'
-                    src={cartItem.product.image}
-                    alt={cartItem.product.name}
-                    borderRadius='md'
-                  />
-                  <Text flex={1}>{cartItem.product.name}</Text>
-                  <Text fontWeight='bold'>${cartItem.product.price}</Text>
-                  <IconButton
-                    icon={<FaTrash />}
-                    colorScheme='red'
-                    onClick={() =>
-                      dispatch(
-                        removeProductFromActiveCart(cartItem.product._id)
-                      )
-                    }
-                    aria-label='Remove from cart'
-                  />
-                </HStack>
-              ))
-            )}
-          </VStack>
+          {showPurchase ? (
+            <Slide direction='right' in={true} style={{ width: '100%' }}>
+              <PurchaseModal handleBackToCart={handleBackToCart} />
+            </Slide>
+          ) : (
+            <Slide direction='left' in={true} style={{ width: '100%' }}>
+              <Box className='bg-white w-full h-full'>
+                <ModalHeader>
+                  Cart
+                  <ModalCloseButton />
+                </ModalHeader>
+                <ModalBody className='max-h-[485px] overflow-y-auto'>
+                  <VStack spacing={4} align='stretch'>
+                    {activeCart.products.length === 0 ? (
+                      <Text>Your cart is empty</Text>
+                    ) : (
+                      activeCart.products.map((cartItem) => (
+                        <HStack
+                          key={cartItem.product._id}
+                          p={3}
+                          borderWidth={1}
+                          borderRadius='md'
+                          justifyContent='space-between'
+                        >
+                          <Image
+                            boxSize='50px'
+                            src={cartItem.product.image}
+                            alt={cartItem.product.name}
+                            borderRadius='md'
+                          />
+                          <Text flex={1}>{cartItem.product.name}</Text>
+                          <Text fontWeight='bold'>
+                            ${cartItem.product.price}
+                          </Text>
+                          <QuantitySelector cartItem={cartItem} />
+                          {/* <IconButton
+                            icon={<FaTrash />}
+                            colorScheme='red'
+                            onClick={() =>
+                              dispatch(
+                                removeProductFromActiveCart(cartItem.product._id)
+                              )
+                            }
+                            aria-label='Remove from cart'
+                          /> */}
+                        </HStack>
+                      ))
+                    )}
+                  </VStack>
+                </ModalBody>
+
+                <ModalFooter>
+                  <Button
+                    colorScheme='blue'
+                    mr={3}
+                    onClick={handlePurchaseClick}
+                  >
+                    Purchase
+                  </Button>
+                  <Button variant='ghost' onClick={onClose}>
+                    Cancel
+                  </Button>
+                </ModalFooter>
+              </Box>
+            </Slide>
+          )}
         </ModalContent>
       </Modal>
       {/* <div className='fixed bottom-0 right-0 m-4'>

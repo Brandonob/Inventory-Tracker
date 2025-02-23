@@ -25,29 +25,37 @@ import {
   setActiveCartId,
 } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { QuantitySelector } from './QuantitySelector';
 
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
   const dispatch = useDispatch();
   const toast = useToast();
-  const state = useSelector((state) => state.carts);
-  const isInActiveCart = isProductInActiveCart(state, product._id);
-  const activeCart = useSelector((state) => state.carts.activeCart);
+
+  // Subscribe to the specific cart item's quantity instead of the whole state
+  const cartItem = useSelector((state) =>
+    state.carts.activeCart.products.find(
+      (item) => item.product._id === product._id
+    )
+  );
+  const isInActiveCart = Boolean(cartItem);
   const activeCartId = useSelector((state) => state.carts.activeCartId);
+  const activeCart = useSelector((state) => state.carts.activeCart);
+
   //check if product is in active cart
   // const tooltip = useTooltip();
-  const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
-    useNumberInput({
-      step: 1,
-      defaultValue: 1,
-      min: 1,
-      max: product.quantity,
-      precision: 0,
-    });
+  // const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
+  //   useNumberInput({
+  //     value,
+  //     step: 1,
+  //     min: 1,
+  //     max: product.quantity,
+  //     precision: 0,
+  //   });
 
-  const increment = getIncrementButtonProps();
-  const decrement = getDecrementButtonProps();
-  const input = getInputProps();
+  // const increment = getIncrementButtonProps();
+  // const decrement = getDecrementButtonProps();
+  // const input = getInputProps();
 
   const createNewCartGetId = async () => {
     try {
@@ -65,7 +73,7 @@ export const ProductCard = ({ product }) => {
   };
 
   const handleAddToActiveCart = async (product) => {
-    debugger;
+    // debugger;
     //Send to RTK and return succes toast
     //if active cart is empty, set the product to the active cart
     const activeCartLength = activeCart.products.length;
@@ -95,29 +103,29 @@ export const ProductCard = ({ product }) => {
     });
   };
 
-  const handleDecrement = (product) => {
-    //removes product from active cart if quantity is 1
-    if (input.value === 1) {
-      dispatch(removeProductFromActiveCart(product));
-    } else {
-      dispatch(
-        decrementCartItemQuantity({ product, quantity: input.value - 1 })
-      );
-    }
-  };
+  // const handleDecrement = (product) => {
+  //   //removes product from active cart if quantity is 1
+  //   if (input.value === 1) {
+  //     dispatch(removeProductFromActiveCart(product));
+  //   } else {
+  //     dispatch(
+  //       decrementCartItemQuantity({ product, quantity: input.value - 1 })
+  //     );
+  //   }
+  // };
 
-  const handleIncrement = (product) => {
-    //return error toast if product quantity is maxed out
-    if (input.value === product.quantity) {
-      toast({
-        title: 'Product quantity is maxed out',
-        description: 'You can not add more than the product quantity',
-        status: 'error',
-      });
-    } else {
-      dispatch(incrementCartItemQuantity({ product, quantity: 1 }));
-    }
-  };
+  // const handleIncrement = (product) => {
+  //   //return error toast if product quantity is maxed out
+  //   if (input.value === product.quantity) {
+  //     toast({
+  //       title: 'Product quantity is maxed out',
+  //       description: 'You can not add more than the product quantity',
+  //       status: 'error',
+  //     });
+  //   } else {
+  //     dispatch(incrementCartItemQuantity({ product, quantity: 1 }));
+  //   }
+  // };
 
   return (
     <Box
@@ -162,15 +170,7 @@ export const ProductCard = ({ product }) => {
           <EditProductModal product={product} />
 
           {isInActiveCart ? (
-            <HStack maxW='320px'>
-              <Button onClick={() => handleDecrement(product)} {...decrement}>
-                -
-              </Button>
-              <Input {...input} />
-              <Button onClick={() => handleIncrement(product)} {...increment}>
-                +
-              </Button>
-            </HStack>
+            <QuantitySelector cartItem={cartItem} />
           ) : (
             <Tooltip label='Add to cart' placement='left'>
               <IconButton
