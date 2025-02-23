@@ -24,7 +24,7 @@ export const QuantitySelector = ({ cartItem }) => {
     useNumberInput({
       value,
       step: 1,
-      min: 1,
+      min: 0,
       max: product.quantity,
       precision: 0,
     });
@@ -34,7 +34,8 @@ export const QuantitySelector = ({ cartItem }) => {
   const input = getInputProps();
 
   const handleDecrement = () => {
-    if (input.value === 1) {
+    debugger;
+    if (parseInt(input.value) === 1) {
       dispatch(removeProductFromActiveCart(product));
     } else {
       dispatch(decrementCartItemQuantity({ product }));

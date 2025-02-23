@@ -21,8 +21,9 @@ const cartsSlice = createSlice({
       state.allCarts = action.payload;
     },
     removeProductFromActiveCart: (state, action) => {
+      debugger;
       state.activeCart.products = state.activeCart.products.filter(
-        (item) => item.product._id !== action.payload
+        (item) => item.product._id !== action.payload._id
       );
     },
     //add product object to products array in active cart
