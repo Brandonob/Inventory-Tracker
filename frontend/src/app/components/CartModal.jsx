@@ -33,6 +33,9 @@ import { SaveCartButton } from './SaveCartButton';
 export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [showPurchase, setShowPurchase] = useState(false);
+  const isEmptyCart = activeCart.products.length < 1;
+  console.log('CART MODAL', activeCart);
+
   const dispatch = useDispatch();
 
   const handlePurchaseClick = () => {
@@ -123,8 +126,12 @@ export const CartModal = ({ activeCart }) => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <SaveCartButton activeCart={activeCart} />
+                  <SaveCartButton
+                    activeCart={activeCart}
+                    isEmptyCart={isEmptyCart}
+                  />
                   <Button
+                    isDisabled={isEmptyCart}
                     colorScheme='blue'
                     mr={3}
                     onClick={handlePurchaseClick}

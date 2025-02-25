@@ -83,10 +83,10 @@ export const ProductCard = ({ product }) => {
       //Post new cart to db and get the id
       //set the id to the active cart id
       //add the product to the active cart
-      const newCartId = await createNewCartGetId();
-      console.log('NEW CART ID', newCartId);
+      // const newCartId = await createNewCartGetId();
+      // console.log('NEW CART ID', newCartId);
       //set active cart id in redux
-      dispatch(setActiveCartId(newCartId));
+      // dispatch(setActiveCartId(newCartId));
       //add the product to the active cart in redux
       dispatch(setActiveCart({ product, quantity: 1 }));
     } else {

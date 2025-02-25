@@ -34,7 +34,7 @@ export const QuantitySelector = ({ cartItem }) => {
   const input = getInputProps();
 
   const handleDecrement = () => {
-    debugger;
+    // debugger;
     if (parseInt(input.value) === 1) {
       dispatch(removeProductFromActiveCart(product));
     } else {

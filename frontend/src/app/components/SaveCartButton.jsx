@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
-import { Button, Input } from '@chakra-ui/react';
+import { Button, Input, useDisclosure } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
+import { SaveCartModal } from './SaveCartModal';
 
-export const SaveCartButton = ({ activeCart }) => {
+export const SaveCartButton = ({ activeCart, isEmptyCart }) => {
+  const { isOpen, onOpen, onClose } = useDisclosure;
   const [cartName, setCartName] = useState('');
   const toast = useToast();
 
@@ -61,39 +63,50 @@ export const SaveCartButton = ({ activeCart }) => {
     }
   };
 
-  const saveCartModal = () => {
-    return (
-      <Box className='bg-white w-full h-full'>
-        <ModalHeader>
-          Save Cart
-          <ModalCloseButton />
-        </ModalHeader>
-        <ModalBody className='max-h-[485px] overflow-y-auto'>
-          <VStack spacing={4} align='stretch'>
-            <FormControl mb={4}>
-              <FormLabel>Name</FormLabel>
-              <Input
-                name='cartName'
-                value={cartName}
-                placeholder='Enter cart name'
-                onChange={(e) => setCartName(e.target.value)}
-              />
-            </FormControl>
-          </VStack>
-        </ModalBody>
+  // const saveCartModal = () => {
+  //   return (
+  //     <Modal isOpen={isOpen} onClose={onClose}>
+  //       <Box className='bg-white w-full h-full'>
+  //         <ModalHeader>
+  //           Save Cart
+  //           <ModalCloseButton />
+  //         </ModalHeader>
+  //         <ModalBody className='max-h-[485px] overflow-y-auto'>
+  //           <VStack spacing={4} align='stretch'>
+  //             <FormControl mb={4}>
+  //               <FormLabel>Name</FormLabel>
+  //               <Input
+  //                 name='cartName'
+  //                 value={cartName}
+  //                 placeholder='Enter cart name'
+  //                 onChange={(e) => setCartName(e.target.value)}
+  //               />
+  //             </FormControl>
+  //           </VStack>
+  //         </ModalBody>
 
-        <ModalFooter>
-          <Button colorScheme='blue' mr={3} onClick={handleSaveCart}>
-            Save Cart
-          </Button>
-        </ModalFooter>
-      </Box>
-    );
-  };
+  //         <ModalFooter>
+  //           <Button colorScheme='blue' mr={3} onClick={handleSaveCart}>
+  //             Save Cart
+  //           </Button>
+  //         </ModalFooter>
+  //       </Box>
+  //     </Modal>
+  //   );
+  // };
 
   return (
     <div>
-      <Button onClick={handleSaveCart}>Save Cart</Button>
+      <SaveCartModal
+        isOpen={isOpen}
+        onClose={onClose}
+        handleSaveCart={handleSaveCart}
+        cartName={cartName}
+        setCartName={setCartName}
+      />
+      <Button onClick={onOpen} isDisabled={isEmptyCart}>
+        Save Cart
+      </Button>
     </div>
   );
 };
