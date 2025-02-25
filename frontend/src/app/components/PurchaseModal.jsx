@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -8,6 +8,13 @@ import {
   ModalBody,
   ModalFooter,
   ModalCloseButton,
+  FormControl,
+  FormLabel,
+  InputGroup,
+  InputLeftAddon,
+  Input,
+  Select,
+  Switch,
 } from '@chakra-ui/react';
 
 export const PurchaseModal = ({ handleBackToCart }) => {
@@ -30,8 +37,8 @@ export const PurchaseModal = ({ handleBackToCart }) => {
             <FormLabel>Payment Method</FormLabel>
             <Select placeholder='Select payment method'>
               <option value='cash'>Cash</option>
-              <option value='credit'>Credit Card</option>
-              <option value='debit'>Debit Card</option>
+              <option value='zelle'>Zelle</option>
+              <option value='cashapp'>Cash App</option>
             </Select>
           </FormControl>
 

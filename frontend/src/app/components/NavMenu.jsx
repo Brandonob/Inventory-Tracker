@@ -8,7 +8,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { ImMenu3 } from 'react-icons/im';
-import { ImMenu4 } from 'react-icons/im';
+// import { ImMenu4 } from 'react-icons/im';
 
 export const NavMenu = () => {
   return (
@@ -31,25 +31,21 @@ export const NavMenu = () => {
           <MenuList>
             <MenuItem
               as='a'
-              href='https://www.crunchyroll.com/naruto'
-              value='naruto'
+              href='http://localhost:3000/carts'
+              value='savedCarts'
             >
-              Naruto
+              Carts
             </MenuItem>
-            <MenuItem
-              as='a'
-              href='https://www.crunchyroll.com/one-piece'
-              value='one-piece'
-            >
-              One Piece
+            <MenuItem as='a' href='http://localhost:3000/orders' value='orders'>
+              Orders
             </MenuItem>
-            <MenuItem
+            {/* <MenuItem
               as='a'
               href='https://www.crunchyroll.com/attack-on-titan'
               value='attack-on-titan'
             >
               Attack on Titan
-            </MenuItem>
+            </MenuItem> */}
           </MenuList>
         </Menu>
       </div>

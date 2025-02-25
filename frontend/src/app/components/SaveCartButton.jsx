@@ -1,8 +1,9 @@
-import React from 'react';
-import { Button } from '@chakra-ui/react';
+import React, { useState } from 'react';
+import { Button, Input } from '@chakra-ui/react';
 import { useToast } from '@chakra-ui/react';
 
-export const SaveCartButton = ({ activeCart, cartId }) => {
+export const SaveCartButton = ({ activeCart }) => {
+  const [cartName, setCartName] = useState('');
   const toast = useToast();
 
   const getActiveCartData = () => {
@@ -11,6 +12,8 @@ export const SaveCartButton = ({ activeCart, cartId }) => {
       //   debugger;
       data.push({
         productId: product.product._id,
+        productImg: product.product.image,
+        productPrice: product.product.price,
         quantity: product.quantity,
       });
     });
@@ -24,11 +27,11 @@ export const SaveCartButton = ({ activeCart, cartId }) => {
       const activeCartData = await getActiveCartData();
       //update cart in database to store activeCart
       const response = await fetch('/api/carts', {
-        method: 'PATCH',
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ cartId, activeCartData }),
+        body: JSON.stringify({ cartName, activeCartData }),
       });
       const data = await response.json();
       console.log('UPDATED CART', data);
@@ -56,6 +59,36 @@ export const SaveCartButton = ({ activeCart, cartId }) => {
     } catch (error) {
       console.log('ERROR IN SAVE CART', error.message);
     }
+  };
+
+  const saveCartModal = () => {
+    return (
+      <Box className='bg-white w-full h-full'>
+        <ModalHeader>
+          Save Cart
+          <ModalCloseButton />
+        </ModalHeader>
+        <ModalBody className='max-h-[485px] overflow-y-auto'>
+          <VStack spacing={4} align='stretch'>
+            <FormControl mb={4}>
+              <FormLabel>Name</FormLabel>
+              <Input
+                name='cartName'
+                value={cartName}
+                placeholder='Enter cart name'
+                onChange={(e) => setCartName(e.target.value)}
+              />
+            </FormControl>
+          </VStack>
+        </ModalBody>
+
+        <ModalFooter>
+          <Button colorScheme='blue' mr={3} onClick={handleSaveCart}>
+            Save Cart
+          </Button>
+        </ModalFooter>
+      </Box>
+    );
   };
 
   return (

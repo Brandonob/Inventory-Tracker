@@ -21,7 +21,6 @@ export default function Home() {
   console.log('PRODUCTS', allProducts);
 
   useEffect(() => {
-    // <InitializeDB />;
     //request to get all products
     dispatch(fetchAllProducts());
   }, [activeCart.products]);

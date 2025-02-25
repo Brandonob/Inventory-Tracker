@@ -70,6 +70,28 @@ const cartsSlice = createSlice({
   },
 });
 
+//function that gets all of the carts
+export const getAllCarts = () => async (dispatch) => {
+  try {
+    const response = await fetch('/api/carts', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      console.log('All Carts', data);
+      dispatch(setAllCarts(data || []));
+    } else {
+      throw new Error('Failed to fetch Carts');
+    }
+  } catch (error) {
+    console.log('Error fetching all carts', error.message);
+  }
+};
+
 //function that returns true if the product is already in the active cart
 export const isProductInActiveCart = (state, productId) => {
   if (state.activeCart.products.length === 0) {

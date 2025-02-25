@@ -28,6 +28,7 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { QuantitySelector } from './QuantitySelector';
+import { SaveCartButton } from './SaveCartButton';
 
 export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -122,15 +123,13 @@ export const CartModal = ({ activeCart }) => {
                 </ModalBody>
 
                 <ModalFooter>
+                  <SaveCartButton activeCart={activeCart} />
                   <Button
                     colorScheme='blue'
                     mr={3}
                     onClick={handlePurchaseClick}
                   >
                     Purchase
-                  </Button>
-                  <Button variant='ghost' onClick={onClose}>
-                    Cancel
                   </Button>
                 </ModalFooter>
               </Box>

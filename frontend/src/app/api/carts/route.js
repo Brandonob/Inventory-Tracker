@@ -2,14 +2,15 @@ import { NextResponse } from 'next/server';
 import { getDB } from '../../../../lib/db';
 import { ObjectId } from 'mongodb';
 
-export async function POST() {
+export async function POST(req) {
   try {
     const db = await getDB();
-    // const body = await req.json();
-    // const { cartData } = body;
+    const body = await req.json();
+    const { cartName, products } = body;
     //create a new cart
     const newCartData = {
-      products: [],
+      cartName,
+      products,
       createdAt: new Date(),
     };
 
@@ -28,7 +29,7 @@ export async function POST() {
   }
 }
 
-export async function GET(req) {
+export async function GET() {
   try {
     const db = await getDB();
     const carts = await db.collection('carts').find({}).toArray();
