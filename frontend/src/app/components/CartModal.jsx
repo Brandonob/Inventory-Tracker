@@ -28,11 +28,13 @@ import {
   Box,
 } from '@chakra-ui/react';
 import { QuantitySelector } from './QuantitySelector';
-import { SaveCartButton } from './SaveCartButton';
+// import { SaveCartButton } from './SaveCart';
+import { SaveCartModal } from './SaveCartModal';
 
 export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [showPurchase, setShowPurchase] = useState(false);
+  const [showSaveCart, setShowSaveCart] = useState(false);
   const isEmptyCart = activeCart.products.length < 1;
   console.log('CART MODAL', activeCart);
 
@@ -43,7 +45,13 @@ export const CartModal = ({ activeCart }) => {
   };
 
   const handleBackToCart = () => {
-    setShowPurchase(false);
+    //checks if purchase modal is open and closes it
+    //If not it closes the save cart modal
+    showPurchase ? setShowPurchase(false) : setShowSaveCart(false);
+  };
+
+  const handleSaveCartClick = () => {
+    setShowSaveCart(true);
   };
 
   return (
@@ -78,6 +86,13 @@ export const CartModal = ({ activeCart }) => {
             <Slide direction='right' in={true} style={{ width: '100%' }}>
               <PurchaseModal handleBackToCart={handleBackToCart} />
             </Slide>
+          ) : showSaveCart ? (
+            <Slide direction='right' in={true} style={{ width: '100%' }}>
+              <SaveCartModal
+                activeCart={activeCart}
+                handleBackToCart={handleBackToCart}
+              />
+            </Slide>
           ) : (
             <Slide direction='left' in={true} style={{ width: '100%' }}>
               <Box className='bg-white w-full h-full'>
@@ -109,16 +124,6 @@ export const CartModal = ({ activeCart }) => {
                             ${cartItem.product.price}
                           </Text>
                           <QuantitySelector cartItem={cartItem} />
-                          {/* <IconButton
-                            icon={<FaTrash />}
-                            colorScheme='red'
-                            onClick={() =>
-                              dispatch(
-                                removeProductFromActiveCart(cartItem.product._id)
-                              )
-                            }
-                            aria-label='Remove from cart'
-                          /> */}
                         </HStack>
                       ))
                     )}
@@ -126,10 +131,7 @@ export const CartModal = ({ activeCart }) => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <SaveCartButton
-                    activeCart={activeCart}
-                    isEmptyCart={isEmptyCart}
-                  />
+                  <Button onClick={handleSaveCartClick}>Save Cart</Button>
                   <Button
                     isDisabled={isEmptyCart}
                     colorScheme='blue'

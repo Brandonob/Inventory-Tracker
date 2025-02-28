@@ -7,7 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import pookieIcon from './components/media/pookieIcon.png';
 import { InitializeDB } from './utils/InitializeDB';
-import { SaveCartButton } from './components/SaveCartButton';
+// import { SaveCartButton } from './components/SaveCart';
 import { CartModal } from './components/CartModal';
 import { NavMenu } from './components/NavMenu';
 
@@ -49,7 +49,7 @@ export default function Home() {
         <div className='flex flex-col w-3/4 '>
           <h1 className='text-4xl font-bold text-white'>In Stock</h1>
           <AddProductsModal />
-          <SaveCartButton activeCart={activeCart} cartId={activeCartId} />
+          {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
           <div className='flex flex-wrap gap-4 justify-center mt-12'>
             {productsInStock.map((product) => (
               <ProductCard key={product._id} product={product} />
