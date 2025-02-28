@@ -12,11 +12,12 @@ import {
   FormLabel,
   VStack,
 } from '@chakra-ui/react';
-
-export const SaveCartModal = ({ activeCart }) => {
+import { useDispatch } from 'react-redux';
+export const SaveCartModal = ({ activeCart, handleBackToCart }) => {
   const [cartName, setCartName] = useState('');
+  console.log('SAVE CART MODAL ACTIVE CART', activeCart);
 
-  const handleSubmit = (e) => {
+  const handleSaveCart = (e) => {
     e.preventDefault();
     //pass down cartName to savecart function
     //call savecart function
@@ -26,13 +27,13 @@ export const SaveCartModal = ({ activeCart }) => {
 
   return (
     <Box className='bg-white w-full h-full'>
-      <ModalHeader>
-        Save Cart
-        <ModalCloseButton />
-      </ModalHeader>
-      <ModalBody className='max-h-[485px] overflow-y-auto'>
-        <VStack spacing={4} align='stretch'>
-          <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSaveCart}>
+        <ModalHeader>
+          Save Cart
+          <ModalCloseButton />
+        </ModalHeader>
+        <ModalBody className='max-h-[485px] overflow-y-auto'>
+          <VStack spacing={4} align='stretch'>
             <FormControl mb={4}>
               <FormLabel>Name</FormLabel>
               <Input
@@ -42,15 +43,18 @@ export const SaveCartModal = ({ activeCart }) => {
                 onChange={(e) => setCartName(e.target.value)}
               />
             </FormControl>
-          </form>
-        </VStack>
-      </ModalBody>
+          </VStack>
+        </ModalBody>
 
-      <ModalFooter>
-        <Button colorScheme='blue' mr={3} onClick={handleSaveCart}>
-          Save Cart
-        </Button>
-      </ModalFooter>
+        <ModalFooter>
+          <Button colorScheme='gray' mr={3} onClick={handleBackToCart}>
+            Back to Cart
+          </Button>
+          <Button type='submit' colorScheme='blue' mr={3}>
+            Save Cart
+          </Button>
+        </ModalFooter>
+      </form>
     </Box>
   );
 };

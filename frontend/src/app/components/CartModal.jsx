@@ -78,7 +78,7 @@ export const CartModal = ({ activeCart }) => {
       {/* Add Item */}
       {/* </Button> */}
 
-      <Modal size='xl' isOpen={isOpen} onClose={onClose}>
+      <Modal size='lg' isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
         <ModalContent>
@@ -131,7 +131,12 @@ export const CartModal = ({ activeCart }) => {
                 </ModalBody>
 
                 <ModalFooter>
-                  <Button onClick={handleSaveCartClick}>Save Cart</Button>
+                  <Button
+                    isDisabled={isEmptyCart}
+                    onClick={handleSaveCartClick}
+                  >
+                    Save Cart
+                  </Button>
                   <Button
                     isDisabled={isEmptyCart}
                     colorScheme='blue'
