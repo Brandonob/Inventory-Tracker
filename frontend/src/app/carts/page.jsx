@@ -11,12 +11,14 @@ import {
   Card,
   CardBody,
   SimpleGrid,
+  Button,
 } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
 import {
   removeProductFromActiveCart,
   setActiveCart,
   getAllCarts,
+  removeCart,
 } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -29,33 +31,78 @@ export default function Cart() {
     dispatch(getAllCarts());
   }, []);
 
-  const cartImages = (cartIem) => {};
+  const getCartImages = (cart) => {
+    return cart.products.map((product) => product.product.image);
+  };
+  const getCartTotal = (cart) => {
+    return cart.products.reduce((total, product) => total + product.price, 0);
+  };
 
   //get the active cart from the allCarts RTK state
   //add isActive to carts collection
   //set the active cart to the cart with isActive true
   console.log(allCarts);
 
+  const handleDeleteCart = async (cartId) => {
+    debugger;
+    try {
+      //remove cart from database
+      const response = await fetch(`/api/carts/${cartId}`, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        console.log('Cart not deleted');
+        throw new Error('Cart not deleted');
+      }
+      console.log('Cart deleted', data);
+      dispatch(removeCart(cartId));
+    } catch (error) {
+      console.log('ERROR IN DELETE CART', error.message);
+    }
+  };
+
   return (
     <Box p={5}>
       <Heading mb={4}>Shopping Carts</Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
-        {allCarts.map((cart, index) => (
-          <Card key={index} boxShadow='md' borderRadius='lg' overflow='hidden'>
-            <CardBody>
-              <Heading size='md' mb={2}>
-                {`${cart.name} Cart`}
-              </Heading>
-              <Text mb={2}>Items: {cart.items.length}</Text>
-              <Text fontWeight='bold' color='green.500'>
-                Total: ${cart.total.toFixed(2)}
-              </Text>
-              <Button mt={3} colorScheme='blue'>
-                View Cart
-              </Button>
-            </CardBody>
-          </Card>
-        ))}
+        {allCarts.length === 0 ? (
+          <Text>No carts saved!</Text>
+        ) : (
+          allCarts.map((cart, index) => (
+            <Card
+              key={index}
+              boxShadow='md'
+              borderRadius='lg'
+              overflow='hidden'
+            >
+              <CardBody>
+                <Heading size='md' mb={2}>
+                  {`${cart.cartName || 'Untitled'} Cart`}
+                </Heading>
+                <Text mb={2}>Items: {cart.products.length}</Text>
+                <Text fontWeight='bold' color='green.500'>
+                  Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
+                </Text>
+                <Button mt={3} colorScheme='blue'>
+                  View Cart
+                </Button>
+                <Button
+                  onClick={() => handleDeleteCart(cart._id)}
+                  mt={3}
+                  colorScheme='red'
+                >
+                  Delete Cart
+                </Button>
+              </CardBody>
+            </Card>
+          ))
+        )}
       </SimpleGrid>
     </Box>
     // <Box

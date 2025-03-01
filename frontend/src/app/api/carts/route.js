@@ -71,3 +71,20 @@ export async function PATCH(req) {
     );
   }
 }
+
+export async function DELETE(req) {
+  try {
+    const db = await getDB();
+    const body = await req.json();
+    const { cartId } = body;
+    const objectId = new ObjectId(cartId);
+    const cart = await db.collection('carts').deleteOne({ _id: objectId });
+    return NextResponse.json(cart, { status: 200 });
+  } catch (error) {
+    console.log('ERROR IN DELETE CART', error.message);
+    return NextResponse.json(
+      { error: 'Failed to delete cart' },
+      { status: 500 }
+    );
+  }
+}
