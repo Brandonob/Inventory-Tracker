@@ -11,18 +11,50 @@ import {
   Input,
   FormLabel,
   VStack,
+  useToast,
 } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import { saveActiveCart } from '../redux/slices/cartsSlice';
+
 export const SaveCartModal = ({ activeCart, handleBackToCart }) => {
+  const dispatch = useDispatch();
+  const toast = useToast();
   const [cartName, setCartName] = useState('');
   console.log('SAVE CART MODAL ACTIVE CART', activeCart);
 
   const handleSaveCart = (e) => {
     e.preventDefault();
+
+    if (!cartName) {
+      toast({
+        title: 'Error',
+        description: 'Please enter a cart name',
+        status: 'error',
+        duration: 3000,
+      });
+      return;
+    }
     //pass down cartName to savecart function
     //call savecart function
     try {
-    } catch (error) {}
+      debugger;
+      dispatch(saveActiveCart(activeCart, cartName));
+
+      toast({
+        title: 'Cart saved',
+        description: 'Cart saved successfully',
+        status: 'success',
+        duration: 3000,
+      });
+    } catch (error) {
+      console.log('ERROR IN SAVE CART MODAL', error.message);
+      toast({
+        title: 'Cart not saved',
+        description: 'Cart not saved successfully',
+        status: 'error',
+        duration: 3000,
+      });
+    }
   };
 
   return (

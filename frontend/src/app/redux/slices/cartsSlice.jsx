@@ -67,6 +67,9 @@ const cartsSlice = createSlice({
       );
       product.quantity = product.quantity - 1;
     },
+    clearActiveCart: (state) => {
+      state.activeCart.products = [];
+    },
   },
 });
 
@@ -104,6 +107,53 @@ export const isProductInActiveCart = (state, productId) => {
   return product ? true : false;
 };
 
+//function that gets the active cart data for POST request
+const getActiveCartData = (activeCart) => {
+  debugger;
+  const data = activeCart.products.map((product) => ({
+    productId: product.product._id,
+    productImg: product.product.image,
+    productPrice: product.product.price,
+    quantity: product.quantity,
+  }));
+  return data;
+};
+
+//function that saves the active cart to the database
+export const saveActiveCart = (activeCart, cartName) => async (dispatch) => {
+  try {
+    debugger;
+    if (!cartName) {
+      throw new Error('Cart name is required');
+    }
+
+    const activeCartData = await getActiveCartData(activeCart);
+
+    const response = await fetch('/api/carts', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ cartName, activeCartData }),
+    });
+    const data = await response.json();
+    console.log('SAVED CART', data);
+
+    if (response.ok) {
+      console.log('Cart updated', data);
+      //clear the active cart
+      dispatch(clearActiveCart());
+      return data;
+      // dispatch(setActiveCart(data));
+    } else {
+      console.log('Cart not saved');
+    }
+    //   dispatch(setActiveCart(data));
+  } catch (error) {
+    console.log('Error saving active cart', error.message);
+  }
+};
+
 export const {
   addCart,
   addProductToActiveCart,
@@ -114,5 +164,6 @@ export const {
   incrementCartItemQuantity,
   decrementCartItemQuantity,
   setActiveCartId,
+  clearActiveCart,
 } = cartsSlice.actions;
 export default cartsSlice.reducer;

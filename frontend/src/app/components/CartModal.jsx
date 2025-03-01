@@ -113,12 +113,12 @@ export const CartModal = ({ activeCart }) => {
                           borderRadius='md'
                           justifyContent='space-between'
                         >
-                          <Image
+                          {/* <Image
                             boxSize='50px'
                             src={cartItem.product.image}
                             alt={cartItem.product.name}
                             borderRadius='md'
-                          />
+                          /> */}
                           <Text flex={1}>{cartItem.product.name}</Text>
                           <Text fontWeight='bold'>
                             ${cartItem.product.price}

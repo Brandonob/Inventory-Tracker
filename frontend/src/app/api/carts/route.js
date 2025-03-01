@@ -6,11 +6,12 @@ export async function POST(req) {
   try {
     const db = await getDB();
     const body = await req.json();
-    const { cartName, products } = body;
+    const { cartName, activeCartData } = body;
     //create a new cart
     const newCartData = {
       cartName,
-      products,
+      products: activeCartData,
+      purchaseStatus: 'pending',
       createdAt: new Date(),
     };
 

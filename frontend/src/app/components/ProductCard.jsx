@@ -34,8 +34,8 @@ export const ProductCard = ({ product }) => {
 
   // Subscribe to the specific cart item's quantity instead of the whole state
   const cartItem = useSelector((state) =>
-    state.carts.activeCart.products.find(
-      (item) => item.product._id === product._id
+    state.carts.activeCart?.products?.find(
+      (item) => item?.product?._id === product._id
     )
   );
   const isInActiveCart = Boolean(cartItem);
