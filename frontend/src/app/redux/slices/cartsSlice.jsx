@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   activeCartId: null,
+  activeCartName: null,
   allCarts: [],
   activeCart: {
     products: [],
@@ -21,7 +22,6 @@ const cartsSlice = createSlice({
       state.allCarts = action.payload;
     },
     removeProductFromActiveCart: (state, action) => {
-      debugger;
       state.activeCart.products = state.activeCart.products.filter(
         (item) => item.product._id !== action.payload._id
       );
@@ -109,7 +109,6 @@ export const isProductInActiveCart = (state, productId) => {
 
 //function that gets the active cart data for POST request
 const getActiveCartData = (activeCart) => {
-  debugger;
   const data = activeCart.products.map((product) => ({
     productId: product.product._id,
     productImg: product.product.image,
@@ -122,7 +121,6 @@ const getActiveCartData = (activeCart) => {
 //function that saves the active cart to the database
 export const saveActiveCart = (activeCart, cartName) => async (dispatch) => {
   try {
-    debugger;
     if (!cartName) {
       throw new Error('Cart name is required');
     }

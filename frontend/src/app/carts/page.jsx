@@ -19,32 +19,62 @@ import {
   setActiveCart,
   getAllCarts,
   removeCart,
+  setActiveCartName,
 } from '../redux/slices/cartsSlice';
+import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 
 export default function Cart() {
   const dispatch = useDispatch();
   const allCarts = useSelector((state) => state.carts.allCarts);
   const activeCart = useSelector((state) => state.carts.activeCart);
+  const allProducts = useSelector((state) => state.products.allProducts);
   //on page load grab all carts from the database
+  //on page load grab all products from the database
   useEffect(() => {
     dispatch(getAllCarts());
+    dispatch(fetchAllProducts());
   }, []);
 
   const getCartImages = (cart) => {
-    return cart.products.map((product) => product.product.image);
+    return cart.products.map((product) => product.productImg);
   };
   const getCartTotal = (cart) => {
-    return cart.products.reduce((total, product) => total + product.price, 0);
+    return cart.products.reduce(
+      (total, product) => total + parseInt(product.productPrice),
+      0
+    );
+  };
+  //function to check if products in cart are in stock and quantity is less than or equal to stock
+  const isCartProductsInStock = (cart) => {
+    //get product from allProducts array
+    return cart.products.every((cartProduct) => {
+      //find product stock in allProducts array
+      //move this outside of the function to avoid re-rendering
+      const stockQuantity = allProducts.find((product) => {
+        if (product._id === cartProduct.productId) {
+          return product.productStock;
+        }
+      });
+
+      if (stockQuantity >= cartProduct.quantity) {
+        return true;
+      } else {
+        return false;
+      }
+    });
   };
 
-  //get the active cart from the allCarts RTK state
-  //add isActive to carts collection
-  //set the active cart to the cart with isActive true
-  console.log(allCarts);
+  //handleSetActiveCartBtn is a function that sets the active cart in RTK state
+  const handleSetActiveCartBtn = (cart) => {
+    //set cart to activeCart in RTK state
+    dispatch(setActiveCart(cart._id));
+    //set activeCartName in RTK state
+    dispatch(setActiveCartName(cart.cartName));
+  };
 
   const handleDeleteCart = async (cartId) => {
-    debugger;
+    // debugger;
     try {
       //remove cart from database
       const response = await fetch(`/api/carts/${cartId}`, {
@@ -70,6 +100,7 @@ export default function Cart() {
   return (
     <Box p={5}>
       <Heading mb={4}>Shopping Carts</Heading>
+      <Text mb={4}>Active Cart: {activeCart.cartName || 'No active cart'}</Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
         {allCarts.length === 0 ? (
           <Text>No carts saved!</Text>
@@ -89,8 +120,12 @@ export default function Cart() {
                 <Text fontWeight='bold' color='green.500'>
                   Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
                 </Text>
-                <Button mt={3} colorScheme='blue'>
-                  View Cart
+                <Button
+                  onClick={() => handleSetActiveCartBtn(cart)}
+                  mt={3}
+                  colorScheme='blue'
+                >
+                  Set Active Cart
                 </Button>
                 <Button
                   onClick={() => handleDeleteCart(cart._id)}
@@ -105,50 +140,5 @@ export default function Cart() {
         )}
       </SimpleGrid>
     </Box>
-    // <Box
-    //   maxW='lg'
-    //   mx='auto'
-    //   mt={10}
-    //   p={6}
-    //   borderWidth={1}
-    //   borderRadius='lg'
-    //   boxShadow='lg'
-    // >
-    //   <Text fontSize='2xl' fontWeight='bold' mb={4}>
-    //     Shopping Cart
-    //   </Text>
-    //   <VStack spacing={4} align='stretch'>
-    //     {activeCart.products.length === 0 ? (
-    //       <Text>Your cart is empty</Text>
-    //     ) : (
-    //       activeCart.products.map((cartItem) => (
-    //         <HStack
-    //           key={cartItem.product._id}
-    //           p={3}
-    //           borderWidth={1}
-    //           borderRadius='md'
-    //           justifyContent='space-between'
-    //         >
-    //           <Image
-    //             boxSize='50px'
-    //             src={cartItem.product.image}
-    //             alt={cartItem.product.name}
-    //             borderRadius='md'
-    //           />
-    //           <Text flex={1}>{cartItem.product.name}</Text>
-    //           <Text fontWeight='bold'>${cartItem.product.price}</Text>
-    //           <IconButton
-    //             icon={<FaTrash />}
-    //             colorScheme='red'
-    //             onClick={() =>
-    //               dispatch(removeProductFromActiveCart(cartItem.product._id))
-    //             }
-    //             aria-label='Remove from cart'
-    //           />
-    //         </HStack>
-    //       ))
-    //     )}
-    //   </VStack>
-    // </Box>
   );
 }
