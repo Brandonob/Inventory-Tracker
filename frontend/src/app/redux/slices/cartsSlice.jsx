@@ -26,6 +26,14 @@ const cartsSlice = createSlice({
         (item) => item.product._id !== action.payload._id
       );
     },
+    //update cart product quantity in active cart
+    updateCartProductQuantity: (state, action) => {
+      const { productId, quantity } = action.payload;
+      const product = state.activeCart.products.find(
+        (item) => item.product._id === productId
+      );
+      product.quantity = quantity;
+    },
     //add product object to products array in active cart
     addProductToActiveCart: (state, action) => {
       state.activeCart = {
@@ -163,5 +171,6 @@ export const {
   decrementCartItemQuantity,
   setActiveCartId,
   clearActiveCart,
+  updateCartProductQuantity,
 } = cartsSlice.actions;
 export default cartsSlice.reducer;

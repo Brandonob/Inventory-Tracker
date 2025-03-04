@@ -18,3 +18,24 @@ export async function DELETE(req, { params }) {
     );
   }
 }
+
+export async function PATCH(req, { params }) {
+  try {
+    const { id } = params;
+    const db = await getDB();
+    const body = await req.json();
+    const objectId = new ObjectId(id);
+
+    const cart = await db
+      .collection('carts')
+      .updateOne({ _id: objectId }, { $set: { ...body } });
+
+    return NextResponse.json(cart, { status: 200 });
+  } catch (error) {
+    console.log('ERROR IN PATCH CART', error.message);
+    return NextResponse.json(
+      { error: 'Failed to update cart' },
+      { status: 500 }
+    );
+  }
+}

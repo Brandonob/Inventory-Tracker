@@ -12,6 +12,7 @@ export async function POST(req) {
       cartName,
       products: activeCartData,
       purchaseStatus: 'pending',
+      isActiveCart: false,
       createdAt: new Date(),
     };
 

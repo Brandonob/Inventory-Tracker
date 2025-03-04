@@ -20,6 +20,7 @@ import {
   getAllCarts,
   removeCart,
   setActiveCartName,
+  updateCartProductQuantity,
 } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -45,32 +46,125 @@ export default function Cart() {
       0
     );
   };
-  //function to check if products in cart are in stock and quantity is less than or equal to stock
-  const isCartProductsInStock = (cart) => {
-    //get product from allProducts array
-    return cart.products.every((cartProduct) => {
-      //find product stock in allProducts array
-      //move this outside of the function to avoid re-rendering
-      const stockQuantity = allProducts.find((product) => {
-        if (product._id === cartProduct.productId) {
-          return product.productStock;
-        }
-      });
-
-      if (stockQuantity >= cartProduct.quantity) {
-        return true;
-      } else {
-        return false;
+  const findProductById = (productId) => {
+    return allProducts.find((product) => {
+      if (product._id === productId) {
+        return product;
       }
     });
   };
+  //function to check if products in cart are in stock and quantity is less than or equal to stock
+  const isCartProductInStock = (cartProduct) => {
+    debugger;
+    //get product from allProducts array
+    const product = findProductById(cartProduct.productId);
+    const stockQuantity = product.productStock;
+
+    if (stockQuantity >= cartProduct.quantity) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
+  const updateCart = async (cartId, cartData) => {
+    debugger;
+    try {
+      const response = await fetch(`/api/carts/${cartId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(cartData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        console.log('Cart not updated');
+        throw new Error('Cart not updated');
+      }
+
+      const data = await response.json();
+      console.log('Cart updated', data);
+    } catch (error) {
+      console.log('ERROR IN UPDATE CART', error.message);
+    }
+  };
 
   //handleSetActiveCartBtn is a function that sets the active cart in RTK state
-  const handleSetActiveCartBtn = (cart) => {
-    //set cart to activeCart in RTK state
-    dispatch(setActiveCart(cart._id));
-    //set activeCartName in RTK state
-    dispatch(setActiveCartName(cart.cartName));
+  const handleSetActiveCartBtn = async (cart) => {
+    //iterate over cart products and check if each product is in stock
+    const cartProducts = cart.products;
+
+    cartProducts.forEach((cartProduct) => {
+      debugger;
+      const product = findProductById(cartProduct.productId);
+      const stockQuantity = product.productStock;
+
+      if (isCartProductInStock(cartProduct)) {
+        //update cart in database
+        //if cart is not active, set isActiveCart to true
+        const updatedCart = updateCart(cart._id, { isActiveCart: true });
+
+        if (updatedCart) {
+          //add product to activeCart in RTK state
+          dispatch(
+            addProductToActiveCart({
+              product: product,
+              quantity: cartProduct.quantity,
+            })
+          );
+          //set activeCartName in RTK state
+          dispatch(setActiveCartName(cart.cartName));
+          //set activeCartId in RTK state
+          dispatch(setActiveCartId(cart._id));
+        } else {
+          console.log('CART FAILED TO UPDATE');
+        }
+      } else {
+        //update cart in database to update cart product quantity
+        //if quantity is greater than stock, set quantity to stock
+        //if stock is 0, remove product from cart
+        // const product = findProductById(cartProduct.productId);
+        // const stockQuantity = product.productStock;
+
+        if (stockQuantity < 1) {
+          //remove product from cart
+          const updatedCart = updateCart(cart._id, {
+            products: cartProducts.filter(
+              (product) => product.productId !== cartProduct.productId
+            ),
+          });
+
+          if (updatedCart) {
+            console.log('Cart updated');
+            //save name and description for toast notification
+          } else {
+            console.log('CART FAILED TO UPDATE');
+          }
+        } else {
+          //update cart in database to update cart product quantity
+          const cartData = {
+            products: cartProducts.map((product) => ({
+              ...product,
+              quantity: stockQuantity,
+            })),
+          };
+          const updatedCart = updateCart(cart._id, cartData);
+
+          if (updatedCart) {
+            dispatch(
+              updateCartProductQuantity({
+                productId: cartProduct.productId,
+                quantity: stockQuantity,
+              })
+            );
+            console.log('Cart updated');
+          } else {
+            console.log('CART FAILED TO UPDATE');
+          }
+        }
+      }
+    });
   };
 
   const handleDeleteCart = async (cartId) => {
