@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Iventory Tracker is a web application designed to help cash business owners efficiently track sales, manage inventory, and facilitate purchases. Built with Next.js, Tailwind CSS, MongoDB, Redux Toolkit, and Chakra UI, this app provides a streamlined way for users to post products, manage carts, and process purchases while allowing customers to browse available products.
+The Inventory Tracker is a web application designed to help cash business owners efficiently track sales, manage inventory, and facilitate purchases. Built with Next.js, Tailwind CSS, MongoDB, Redux Toolkit, and Chakra UI, this app provides a streamlined way for users to post products, manage carts, and process purchases while allowing customers to browse available products.
 
 ## Features
 
