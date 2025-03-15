@@ -25,16 +25,6 @@ export default function Home() {
     dispatch(fetchAllProducts());
   }, [activeCart.products]);
 
-  // const fetchProducts = async () => {
-  //   try {
-  //     const products = await getAllProducts();
-  //     setProducts(products);
-  //   } catch (error) {
-  //     console.error('Error fetching products:', error);
-  //     setProducts([]); // Set empty array as fallback
-  //   }
-  // };
-
   const productsInStock = allProducts.filter((product) => product.quantity > 0);
   console.log('PRODUCTS IN STOCK', productsInStock);
 
