@@ -19,8 +19,7 @@ import {
   setActiveCart,
   getAllCarts,
   removeCart,
-  setActiveCartName,
-  updateCartProductQuantity,
+  setActiveCart,
 } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -60,7 +59,7 @@ export default function Cart() {
     debugger;
     //get product from allProducts array
     const product = findProductById(cartProduct.productId);
-    const stockQuantity = product.productStock;
+    const stockQuantity = product.quantity;
 
     if (stockQuantity >= cartProduct.quantity) {
       return true;
@@ -77,6 +76,30 @@ export default function Cart() {
         body: JSON.stringify(cartData),
         headers: {
           'Content-Type': 'application/json',
+          },
+        });
+
+      if (!response.ok) {
+        console.log('Cart not updated');
+        throw new Error('Cart not updated');
+      }
+      
+      const updatedCart = await response.json();
+      console.log('Cart updated', updatedCart);
+      return updatedCart;
+    } catch (error) {
+      console.log('ERROR IN UPDATE CART', error.message);
+    }
+  };
+
+  const updateCartProduct = async (cartId, cartProductId, cartData) => {
+    debugger;
+    try {
+      const response = await fetch(`/api/carts/${cartId}/${cartProductId}`, {
+        method: 'PATCH',
+        body: JSON.stringify(cartData),
+        headers: {
+          'Content-Type': 'application/json',
         },
       });
 
@@ -85,8 +108,8 @@ export default function Cart() {
         throw new Error('Cart not updated');
       }
 
-      const data = await response.json();
-      console.log('Cart updated', data);
+      const updatedCart = await response.json();
+      console.log('Cart updated', updatedCart);
     } catch (error) {
       console.log('ERROR IN UPDATE CART', error.message);
     }
@@ -100,7 +123,7 @@ export default function Cart() {
     cartProducts.forEach((cartProduct) => {
       debugger;
       const product = findProductById(cartProduct.productId);
-      const stockQuantity = product.productStock;
+      const stockQuantity = product.quantity;
 
       if (isCartProductInStock(cartProduct)) {
         //update cart in database
@@ -128,12 +151,11 @@ export default function Cart() {
         //if stock is 0, remove product from cart
        
         if (stockQuantity < 1) {
+          const cartData = {
+            method: 'DELETE',
+          };
           //remove product from cart
-          const updatedCart = updateCart(cart._id, {
-            products: cartProducts.filter(
-              (product) => product.productId !== cartProduct.productId
-            ),
-          });
+          const updatedCart = updateCartProduct(cart._id, cartProduct.productId, cartData);
 
           if (!updatedCart) {
             //save name and description for toast notification
@@ -155,16 +177,14 @@ export default function Cart() {
           }
 
         } else {
-          //update cart in database to update cart product quantity
+          //update cart product in database to update cart product quantity
           const cartData = {
-            products: cartProducts.map((product) => ({
-              ...product,
               quantity: stockQuantity,
-            })),
+              method: 'UPDATE',
           };
           console.log('CART DATA', cartData);
           
-          const updatedCart = updateCart(cart._id, cartData);
+          const updatedCart = updateCartProduct(cart._id, cartProduct.productId, cartData);
 
           if (!updatedCart) {
 
@@ -177,10 +197,8 @@ export default function Cart() {
             });
 
           } else {
-
             console.log('Cart updated');
-            dispatch(
-              updateCartProductQuantity({
+            dispatch(({
                 productId: cartProduct.productId,
                 quantity: stockQuantity,
               })
