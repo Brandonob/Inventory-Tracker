@@ -50,6 +50,9 @@ const cartsSlice = createSlice({
     setActiveCartId: (state, action) => {
       state.activeCartId = action.payload;
     },
+    setActiveCartName: (state, action) => {
+      state.activeCartName = action.payload;
+    },
     setActiveCart: (state, action) => {
       state.activeCart.products = [action.payload];
     },
@@ -68,7 +71,6 @@ const cartsSlice = createSlice({
     },
     decrementCartItemQuantity: (state, action) => {
       //find product in active cart and only decrement the quantity by 1 here, not from  payload
-
       const { product: productData } = action.payload;
       const product = state.activeCart.products.find(
         (item) => item.product._id === productData._id
@@ -172,5 +174,6 @@ export const {
   setActiveCartId,
   clearActiveCart,
   updateCartProductQuantity,
+  setActiveCartName,
 } = cartsSlice.actions;
 export default cartsSlice.reducer;

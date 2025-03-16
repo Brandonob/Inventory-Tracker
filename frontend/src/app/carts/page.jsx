@@ -12,10 +12,10 @@ import {
   CardBody,
   SimpleGrid,
   Button,
+  useToast,
 } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
 import {
-  removeProductFromActiveCart,
   setActiveCart,
   getAllCarts,
   removeCart,
@@ -30,6 +30,7 @@ export default function Cart() {
   const allCarts = useSelector((state) => state.carts.allCarts);
   const activeCart = useSelector((state) => state.carts.activeCart);
   const allProducts = useSelector((state) => state.products.allProducts);
+  const toast = useToast();
   //on page load grab all carts from the database
   //on page load grab all products from the database
   useEffect(() => {
@@ -42,7 +43,8 @@ export default function Cart() {
   };
   const getCartTotal = (cart) => {
     return cart.products.reduce(
-      (total, product) => total + parseInt(product.productPrice),
+      (total, product) =>
+        (total += parseInt(product.productPrice) * parseInt(product.quantity)),
       0
     );
   };
@@ -124,9 +126,7 @@ export default function Cart() {
         //update cart in database to update cart product quantity
         //if quantity is greater than stock, set quantity to stock
         //if stock is 0, remove product from cart
-        // const product = findProductById(cartProduct.productId);
-        // const stockQuantity = product.productStock;
-
+       
         if (stockQuantity < 1) {
           //remove product from cart
           const updatedCart = updateCart(cart._id, {
@@ -135,12 +135,25 @@ export default function Cart() {
             ),
           });
 
-          if (updatedCart) {
-            console.log('Cart updated');
+          if (!updatedCart) {
             //save name and description for toast notification
-          } else {
             console.log('CART FAILED TO UPDATE');
+            toast({
+              title: 'Cart failed to update',
+              description: 'Out of stock product not removed from cart',
+              status: 'error',
+              duration: 3000,
+            });
+          } else {
+            console.log('Cart updated', updatedCart);
+            toast({
+              title: 'Product out of stock!',
+              description: 'Product removed from cart',
+              status: 'warning',
+              duration: 3000,
+            });
           }
+
         } else {
           //update cart in database to update cart product quantity
           const cartData = {
@@ -149,18 +162,35 @@ export default function Cart() {
               quantity: stockQuantity,
             })),
           };
+          console.log('CART DATA', cartData);
+          
           const updatedCart = updateCart(cart._id, cartData);
 
-          if (updatedCart) {
+          if (!updatedCart) {
+
+            console.log('CART FAILED TO UPDATE');
+            toast({
+              title: 'Cart failed to update',
+              description: 'Partial stock quantity not updated',
+              status: 'error',
+              duration: 3000,
+            });
+
+          } else {
+
+            console.log('Cart updated');
             dispatch(
               updateCartProductQuantity({
                 productId: cartProduct.productId,
                 quantity: stockQuantity,
               })
             );
-            console.log('Cart updated');
-          } else {
-            console.log('CART FAILED TO UPDATE');
+            toast({
+              title: 'Cart updated',
+              description: 'Partial stock quantity updated',
+              status: 'success',
+              duration: 3000,
+            });
           }
         }
       }
@@ -186,8 +216,20 @@ export default function Cart() {
       }
       console.log('Cart deleted', data);
       dispatch(removeCart(cartId));
+      toast({
+        title: 'Cart deleted',
+        description: 'Cart deleted successfully',
+        status: 'success',
+        duration: 3000, 
+      });
     } catch (error) {
       console.log('ERROR IN DELETE CART', error.message);
+      toast({
+        title: 'Cart not deleted',
+        description: 'Cart not deleted',
+        status: 'error',
+        duration: 3000,
+      });
     }
   };
 
@@ -214,8 +256,14 @@ export default function Cart() {
                 <Text fontWeight='bold' color='green.500'>
                   Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
                 </Text>
+                {/* Prompt user to save current cart before setting a new one */} 
                 <Button
-                  onClick={() => handleSetActiveCartBtn(cart)}
+                  onClick={() => activeCart.length > 0 ? toast({
+                    title: 'Save Cart ',
+                    description: 'Please save your current cart before setting a new one',
+                    status: 'error',
+                    duration: 3000, 
+                  }) : handleSetActiveCartBtn(cart)}
                   mt={3}
                   colorScheme='blue'
                 >

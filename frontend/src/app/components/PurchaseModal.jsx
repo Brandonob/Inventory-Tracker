@@ -20,6 +20,21 @@ import {
 export const PurchaseModal = ({ handleBackToCart }) => {
   const [showPartialAmount, setShowPartialAmount] = useState(false);
 
+  const handlePurchase = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch('/api/purchases', {
+        method: 'POST',
+        body: JSON.stringify(purchaseData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+    } catch (error) {
+      console.error('Error purchasing:', error);
+    }
+  };
+
   return (
     <Box className='bg-white w-full h-full'>
       <ModalHeader>Complete Purchase</ModalHeader>
@@ -69,7 +84,7 @@ export const PurchaseModal = ({ handleBackToCart }) => {
         <Button colorScheme='gray' mr={3} onClick={handleBackToCart}>
           Back to Cart
         </Button>
-        <Button colorScheme='blue'>Confirm Purchase</Button>
+        <Button colorScheme='blue' onClick={handlePurchase}>Confirm Purchase</Button>
       </ModalFooter>
     </Box>
   );
