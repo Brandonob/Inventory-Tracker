@@ -77,7 +77,7 @@ const cartsSlice = createSlice({
       );
       product.quantity = product.quantity - 1;
     },
-    clearActiveCart: (state) => {
+    clearActiveCartProducts: (state) => {
       state.activeCart.products = [];
     },
   },
@@ -172,7 +172,7 @@ export const {
   incrementCartItemQuantity,
   decrementCartItemQuantity,
   setActiveCartId,
-  clearActiveCart,
+  clearActiveCartProducts,
   updateCartProductQuantity,
   setActiveCartName,
 } = cartsSlice.actions;

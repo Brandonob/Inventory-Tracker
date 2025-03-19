@@ -2,13 +2,15 @@ import { getDB } from '../../../../../lib/db';
 import { ObjectId } from 'mongodb';
 import { NextResponse } from 'next/server';
 
-export async function DELETE({ params }) {
+export async function DELETE(req, { params }) {
   try {
-    const { id } = params;
+    debugger;
+    const { cartId } = params;
+    console.log('PARAMSSSSS', cartId);
+    
     const db = await getDB();
-    const cartId = new ObjectId(id);
 
-    const cart = await db.collection('carts').deleteOne({ _id: cartId });
+    const cart = await db.collection('carts').deleteOne({ _id: new ObjectId(cartId) });
     return NextResponse.json(cart, { status: 200 });
   } catch (error) {
     console.log('ERROR IN DELETE CART', error.message);
@@ -17,18 +19,22 @@ export async function DELETE({ params }) {
       { status: 500 }
     );
   }
-}
+} 
 
 export async function PATCH(req, { params }) {
   try {
-    const { id } = params;
+    const { cartId } = params;
     const db = await getDB();
     const body = await req.json();
-    const cartId = new ObjectId(id);
+
+    const { isActiveCart } = body;
 
     const cart = await db
       .collection('carts')
-      .updateOne({ _id: cartId }, { $set: { ...body } });
+      .updateOne(
+        { _id: new ObjectId(cartId) }, 
+        { $set: { isActiveCart } }
+      );
 
     return NextResponse.json(cart, { status: 200 });
   } catch (error) {

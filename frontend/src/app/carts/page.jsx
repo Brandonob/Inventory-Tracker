@@ -16,10 +16,12 @@ import {
 } from '@chakra-ui/react';
 import { FaTrash } from 'react-icons/fa';
 import {
-  setActiveCart,
   getAllCarts,
   removeCart,
-  setActiveCart,
+  addProductToActiveCart,
+  setActiveCartName,
+  setActiveCartId,
+  clearActiveCartProducts,
 } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -76,8 +78,8 @@ export default function Cart() {
         body: JSON.stringify(cartData),
         headers: {
           'Content-Type': 'application/json',
-          },
-        });
+        },
+      });
 
       if (!response.ok) {
         console.log('Cart not updated');
@@ -89,6 +91,7 @@ export default function Cart() {
       return updatedCart;
     } catch (error) {
       console.log('ERROR IN UPDATE CART', error.message);
+      return null;
     }
   };
 
@@ -117,106 +120,121 @@ export default function Cart() {
 
   //handleSetActiveCartBtn is a function that sets the active cart in RTK state
   const handleSetActiveCartBtn = async (cart) => {
-    //iterate over cart products and check if each product is in stock
     const cartProducts = cart.products;
-
-    cartProducts.forEach((cartProduct) => {
-      debugger;
+    let canSetActiveCart = true;
+    
+    // Clear existing active cart from Redux state first
+    dispatch(setActiveCartId(null));
+    dispatch(setActiveCartName(''));
+    dispatch(clearActiveCartProducts());
+    
+    // Process all cart products first
+    for (const cartProduct of cartProducts) {
       const product = findProductById(cartProduct.productId);
       const stockQuantity = product.quantity;
 
-      if (isCartProductInStock(cartProduct)) {
-        //update cart in database
-        //if cart is not active, set isActiveCart to true
-        const updatedCart = updateCart(cart._id, { isActiveCart: true });
-
-        if (updatedCart) {
-          //add product to activeCart in RTK state
-          dispatch(
-            addProductToActiveCart({
-              product: product,
-              quantity: cartProduct.quantity,
-            })
-          );
-          //set activeCartName in RTK state
-          dispatch(setActiveCartName(cart.cartName));
-          //set activeCartId in RTK state
-          dispatch(setActiveCartId(cart._id));
+      if (stockQuantity < 1) {
+        // Remove out of stock products
+        const cartData = { method: 'DELETE' };
+        const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
+        
+        if (!updatedCart) {
+          toast({
+            title: 'Cart failed to update',
+            description: 'Out of stock product not removed from cart',
+            status: 'error',
+            duration: 3000,
+          });
+          canSetActiveCart = false;
         } else {
-          console.log('CART FAILED TO UPDATE');
+          toast({
+            title: 'Product out of stock!',
+            description: 'Product removed from cart',
+            status: 'warning',
+            duration: 3000,
+          });
         }
-      } else {
-        //update cart in database to update cart product quantity
-        //if quantity is greater than stock, set quantity to stock
-        //if stock is 0, remove product from cart
-       
-        if (stockQuantity < 1) {
-          const cartData = {
-            method: 'DELETE',
-          };
-          //remove product from cart
-          const updatedCart = updateCartProduct(cart._id, cartProduct.productId, cartData);
-
-          if (!updatedCart) {
-            //save name and description for toast notification
-            console.log('CART FAILED TO UPDATE');
-            toast({
-              title: 'Cart failed to update',
-              description: 'Out of stock product not removed from cart',
-              status: 'error',
-              duration: 3000,
-            });
-          } else {
-            console.log('Cart updated', updatedCart);
-            toast({
-              title: 'Product out of stock!',
-              description: 'Product removed from cart',
-              status: 'warning',
-              duration: 3000,
-            });
-          }
-
+      } else if (stockQuantity < cartProduct.quantity) {
+        // Update quantity for partially in stock products
+        const cartData = {
+          quantity: stockQuantity,
+          method: 'UPDATE',
+        };
+        
+        const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
+        
+        if (!updatedCart) {
+          toast({
+            title: 'Cart failed to update',
+            description: 'Partial stock quantity not updated',
+            status: 'error',
+            duration: 3000,
+          });
+          canSetActiveCart = false;
         } else {
-          //update cart product in database to update cart product quantity
-          const cartData = {
-              quantity: stockQuantity,
-              method: 'UPDATE',
-          };
-          console.log('CART DATA', cartData);
-          
-          const updatedCart = updateCartProduct(cart._id, cartProduct.productId, cartData);
-
-          if (!updatedCart) {
-
-            console.log('CART FAILED TO UPDATE');
-            toast({
-              title: 'Cart failed to update',
-              description: 'Partial stock quantity not updated',
-              status: 'error',
-              duration: 3000,
-            });
-
-          } else {
-            console.log('Cart updated');
-            dispatch(({
-                productId: cartProduct.productId,
-                quantity: stockQuantity,
-              })
-            );
-            toast({
-              title: 'Cart updated',
-              description: 'Partial stock quantity updated',
-              status: 'success',
-              duration: 3000,
-            });
-          }
+          toast({
+            title: 'Cart updated',
+            description: 'Product quantity adjusted to match available stock',
+            status: 'success',
+            duration: 3000,
+          });
         }
       }
-    });
+    }
+
+    // Only set as active cart if all updates succeeded
+    if (canSetActiveCart) {
+      // First, set isActiveCart to false for all carts using Redux state
+      for (const existingCart of allCarts) {
+        if (existingCart.isActiveCart) {
+          await updateCart(existingCart._id, { isActiveCart: false });
+        }
+      }
+
+      // Then set the selected cart as active
+      const cartData = { isActiveCart: true };
+      const updatedCart = await updateCart(cart._id, cartData);
+
+      if (updatedCart) {
+        // Update Redux state with available products
+        const availableProducts = cartProducts.filter(cartProduct => {
+          const product = findProductById(cartProduct.productId);
+          return product.quantity > 0;
+        }).map(cartProduct => {
+          const product = findProductById(cartProduct.productId);
+          return {
+            product,
+            quantity: Math.min(cartProduct.quantity, product.quantity)
+          };
+        });
+
+        // Update Redux state with new cart data
+        availableProducts.forEach(({ product, quantity }) => {
+          dispatch(addProductToActiveCart({ product, quantity }));
+        });
+        
+        dispatch(setActiveCartName(cart.cartName));
+        dispatch(setActiveCartId(cart._id));
+
+        toast({
+          title: 'Cart Activated',
+          description: 'Previous cart cleared and new cart set as active',
+          status: 'success',
+          duration: 3000,
+        });
+      } else {
+        toast({
+          title: 'Error',
+          description: 'Failed to set cart as active',
+          status: 'error',
+          duration: 3000,
+        });
+      }
+    }
   };
 
   const handleDeleteCart = async (cartId) => {
-    // debugger;
+    debugger;
     try {
       //remove cart from database
       const response = await fetch(`/api/carts/${cartId}`, {
