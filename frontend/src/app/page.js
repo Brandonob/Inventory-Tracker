@@ -10,20 +10,38 @@ import { InitializeDB } from './utils/InitializeDB';
 // import { SaveCartButton } from './components/SaveCart';
 import { CartModal } from './components/CartModal';
 import { NavMenu } from './components/NavMenu';
+import Link from 'next/link';
+import { setActiveCartName, setActiveCartId, addProductToActiveCart } from './redux/slices/cartsSlice';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
     (state) => state.products
   );
+  const allCarts = useSelector((state) => state.carts.allCarts);
   const activeCart = useSelector((state) => state.carts.activeCart);
+  const activeCartProducts = activeCart?.products || [];
   const activeCartId = useSelector((state) => state.carts.activeCartId);
   const dispatch = useDispatch();
-  console.log('PRODUCTS', allProducts);
+
+  // Add memoized function to find active cart
+  const findActiveCart = React.useMemo(() => {
+    return allCarts.find(cart => cart.isActiveCart === true);
+  }, [allCarts]);
 
   useEffect(() => {
-    //request to get all products
     dispatch(fetchAllProducts());
-  }, [activeCart.products]);
+    // If there's an active cart, set it in the Redux state
+    if (findActiveCart) {
+      dispatch(setActiveCartName(findActiveCart.cartName));
+      dispatch(setActiveCartId(findActiveCart._id));
+      findActiveCart.products.forEach(product => {
+        dispatch(addProductToActiveCart({
+          product: product,
+          quantity: product.quantity
+        }));
+      });
+    }
+  }, [findActiveCart]);
 
   const productsInStock = allProducts.filter((product) => product.quantity > 0);
   console.log('PRODUCTS IN STOCK', productsInStock);
@@ -34,7 +52,9 @@ export default function Home() {
       <InitializeDB />
       <div className='flex flex-col items-center justify-center bg-black'>
         <div className='flex items-center justify-center'>
-          <Image src={pookieIcon} alt='logo' width={300} height={300} />
+          <Link href="/">
+            <Image src={pookieIcon} alt='logo' width={300} height={300} />
+          </Link>
         </div>
         <div className='flex flex-col w-3/4 '>
           <h1 className='text-4xl font-bold text-white'>In Stock</h1>
@@ -46,7 +66,7 @@ export default function Home() {
             ))}
           </div>
         </div>
-        <CartModal activeCart={activeCart} />
+        <CartModal activeCart={activeCart || { products: [] }} />
         {/* <CartPreviewModal activeCart={activeCart} /> */}
         <NavMenu />
       </div>

@@ -35,7 +35,7 @@ export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [showPurchase, setShowPurchase] = useState(false);
   const [showSaveCart, setShowSaveCart] = useState(false);
-  const isEmptyCart = activeCart.products.length < 1;
+  const isEmptyCart = !activeCart?.products?.length;
   console.log('CART MODAL', activeCart);
 
   const dispatch = useDispatch();
@@ -102,7 +102,7 @@ export const CartModal = ({ activeCart }) => {
                 </ModalHeader>
                 <ModalBody className='max-h-[485px] overflow-y-auto'>
                   <VStack spacing={4} align='stretch'>
-                    {activeCart.products.length === 0 ? (
+                    {!activeCart?.products?.length ? (
                       <Text>Your cart is empty</Text>
                     ) : (
                       activeCart.products.map((cartItem) => (

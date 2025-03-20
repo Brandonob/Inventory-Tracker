@@ -5,7 +5,6 @@ import {
   Text,
   VStack,
   HStack,
-  Image,
   IconButton,
   Heading,
   Card,
@@ -22,9 +21,16 @@ import {
   setActiveCartName,
   setActiveCartId,
   clearActiveCartProducts,
+  setLoading,
+  setError,
+  setLoadingComplete,
+  setActiveCart,
 } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Image from 'next/image';
+import pookieIcon from '../components/media/pookieIcon.png';
+import Link from 'next/link';
 
 export default function Cart() {
   const dispatch = useDispatch();
@@ -120,115 +126,133 @@ export default function Cart() {
 
   //handleSetActiveCartBtn is a function that sets the active cart in RTK state
   const handleSetActiveCartBtn = async (cart) => {
-    const cartProducts = cart.products;
     let canSetActiveCart = true;
-    
-    // Clear existing active cart from Redux state first
-    dispatch(setActiveCartId(null));
-    dispatch(setActiveCartName(''));
-    dispatch(clearActiveCartProducts());
-    
-    // Process all cart products first
-    for (const cartProduct of cartProducts) {
-      const product = findProductById(cartProduct.productId);
-      const stockQuantity = product.quantity;
+    try {
+      dispatch(setLoading());
+      const cartProducts = cart.products;
+      
+      // Clear existing active cart from Redux state first
+      dispatch(setActiveCartId(null));
+      dispatch(setActiveCartName(''));
+      dispatch(clearActiveCartProducts());
+      
+      // Process all cart products first
+      for (const cartProduct of cartProducts) {
+        const product = findProductById(cartProduct.productId);
+        const stockQuantity = product.quantity;
 
-      if (stockQuantity < 1) {
-        // Remove out of stock products
-        const cartData = { method: 'DELETE' };
-        const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
-        
-        if (!updatedCart) {
-          toast({
-            title: 'Cart failed to update',
-            description: 'Out of stock product not removed from cart',
-            status: 'error',
-            duration: 3000,
-          });
-          canSetActiveCart = false;
-        } else {
-          toast({
-            title: 'Product out of stock!',
-            description: 'Product removed from cart',
-            status: 'warning',
-            duration: 3000,
-          });
+        if (stockQuantity < 1) {
+          const cartData = { method: 'DELETE' };
+          const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
+          
+          if (!updatedCart) {
+            dispatch(setError('Failed to remove out of stock product'));
+            toast({
+              title: 'Cart failed to update',
+              description: 'Out of stock product not removed from cart',
+              status: 'error',
+              duration: 3000,
+            });
+            canSetActiveCart = false;
+          } else {
+            toast({
+              title: 'Product out of stock!',
+              description: 'Product removed from cart',
+              status: 'warning',
+              duration: 3000,
+            });
+          }
+        } else if (stockQuantity < cartProduct.quantity) {
+          const cartData = {
+            quantity: stockQuantity,
+            method: 'UPDATE',
+          };
+          
+          const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
+          
+          if (!updatedCart) {
+            dispatch(setError('Failed to update product quantity'));
+            toast({
+              title: 'Cart failed to update',
+              description: 'Partial stock quantity not updated',
+              status: 'error',
+              duration: 3000,
+            });
+            canSetActiveCart = false;
+          } else {
+            toast({
+              title: 'Cart updated',
+              description: 'Product quantity adjusted to match available stock',
+              status: 'success',
+              duration: 3000,
+            });
+          }
         }
-      } else if (stockQuantity < cartProduct.quantity) {
-        // Update quantity for partially in stock products
-        const cartData = {
-          quantity: stockQuantity,
-          method: 'UPDATE',
-        };
-        
-        const updatedCart = await updateCartProduct(cart._id, cartProduct.productId, cartData);
-        
-        if (!updatedCart) {
-          toast({
-            title: 'Cart failed to update',
-            description: 'Partial stock quantity not updated',
-            status: 'error',
-            duration: 3000,
+      }
+
+      if (canSetActiveCart) {
+        for (const existingCart of allCarts) {
+          if (existingCart.isActiveCart) {
+            await updateCart(existingCart._id, { isActiveCart: false });
+          }
+        }
+
+        const cartData = { isActiveCart: true };
+        const updatedCart = await updateCart(cart._id, cartData);
+
+        if (updatedCart) {
+          const availableProducts = cartProducts.filter(cartProduct => {
+            const product = findProductById(cartProduct.productId);
+            return product.quantity > 0;
+          }).map(cartProduct => {
+            const product = findProductById(cartProduct.productId);
+            return {
+              product,
+              quantity: Math.min(cartProduct.quantity, product.quantity)
+            };
           });
-          canSetActiveCart = false;
-        } else {
+
+          availableProducts.forEach(({ product, quantity }) => {
+            if (activeCart.products.length === 0) {
+              dispatch(setActiveCart({ product, quantity }));
+            } else {
+              dispatch(addProductToActiveCart({ product, quantity }));
+            }
+          });
+          
+          dispatch(setActiveCartName(cart.cartName));
+          dispatch(setActiveCartId(cart._id));
+          dispatch(getAllCarts());
+          dispatch(setLoadingComplete());
+
           toast({
-            title: 'Cart updated',
-            description: 'Product quantity adjusted to match available stock',
+            title: 'Cart Activated',
+            description: 'Previous cart cleared and new cart set as active',
             status: 'success',
             duration: 3000,
           });
+        } else {
+          dispatch(setError('Failed to set cart as active'));
+          toast({
+            title: 'Error',
+            description: 'Failed to set cart as active',
+            status: 'error',
+            duration: 3000,
+          });
         }
       }
-    }
-
-    // Only set as active cart if all updates succeeded
-    if (canSetActiveCart) {
-      // First, set isActiveCart to false for all carts using Redux state
-      for (const existingCart of allCarts) {
-        if (existingCart.isActiveCart) {
-          await updateCart(existingCart._id, { isActiveCart: false });
-        }
-      }
-
-      // Then set the selected cart as active
-      const cartData = { isActiveCart: true };
-      const updatedCart = await updateCart(cart._id, cartData);
-
-      if (updatedCart) {
-        // Update Redux state with available products
-        const availableProducts = cartProducts.filter(cartProduct => {
-          const product = findProductById(cartProduct.productId);
-          return product.quantity > 0;
-        }).map(cartProduct => {
-          const product = findProductById(cartProduct.productId);
-          return {
-            product,
-            quantity: Math.min(cartProduct.quantity, product.quantity)
-          };
-        });
-
-        // Update Redux state with new cart data
-        availableProducts.forEach(({ product, quantity }) => {
-          dispatch(addProductToActiveCart({ product, quantity }));
-        });
-        
-        dispatch(setActiveCartName(cart.cartName));
-        dispatch(setActiveCartId(cart._id));
-
-        toast({
-          title: 'Cart Activated',
-          description: 'Previous cart cleared and new cart set as active',
-          status: 'success',
-          duration: 3000,
-        });
-      } else {
-        toast({
-          title: 'Error',
-          description: 'Failed to set cart as active',
-          status: 'error',
-          duration: 3000,
-        });
+    } catch (error) {
+      dispatch(setError(error.message));
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred',
+        status: 'error',
+        duration: 3000,
+      });
+      canSetActiveCart = false;
+    } finally {
+      if (!canSetActiveCart) {
+        dispatch(setLoadingComplete());
       }
     }
   };
@@ -269,10 +293,19 @@ export default function Cart() {
     }
   };
 
+  const findActiveCart = React.useMemo(() => {
+    return allCarts.find(cart => cart.isActiveCart === true);
+  }, [allCarts]);
+
   return (
     <Box p={5}>
+      <Box display="flex" justifyContent="center" mb={4}>
+        <Link href="/">
+          <Image src={pookieIcon} alt='logo' width={300} height={300} />
+        </Link>
+      </Box>
       <Heading mb={4}>Shopping Carts</Heading>
-      <Text mb={4}>Active Cart: {activeCart.cartName || 'No active cart'}</Text>
+      <Text mb={4}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
         {allCarts.length === 0 ? (
           <Text>No carts saved!</Text>

@@ -1,9 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit';
-import usersReducer from './slices/usersSlice';
 import cartsReducer from './slices/cartsSlice';
 import productsReducer from './slices/productsSlice';
-import databaseReducer from './slices/databaseSlice';
-import purchaseReducer from './slices/purchaseSlice';
 import { localStorageMiddleware } from './middleware/localStorageMiddleware';
 
 // Load cart state from localStorage
@@ -23,12 +20,9 @@ const cartState = loadCartState();
 
 export const store = configureStore({
   reducer: {
-    users: usersReducer,
     carts: cartsReducer,
     products: productsReducer,
-    database: databaseReducer,
-    purchases: purchaseReducer,
-    },
+  },
   preloadedState: {
     carts: {
       ...cartState,
@@ -39,6 +33,4 @@ export const store = configureStore({
   },
   middleware: (getDefaultMiddleware) => 
     getDefaultMiddleware().concat(localStorageMiddleware),
-  });
-
-export default store;
+}); 
