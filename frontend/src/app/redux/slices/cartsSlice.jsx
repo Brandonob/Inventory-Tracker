@@ -3,11 +3,11 @@ import { createSlice } from '@reduxjs/toolkit';
 const initialState = {
   activeCartId: null,
   activeCartName: null,
-  allCarts: [],
   activeCart: {
     products: [],
     // [{ product: { id: 1, name: 'test', price: 100 }, quantity: 1 }],
   },
+  allCarts: [],
   loading: false,
   error: null,
 };
@@ -206,6 +206,17 @@ export const saveActiveCart = (activeCart, cartName) => async (dispatch) => {
   } catch (error) {
     console.log('Error saving active cart', error.message);
   }
+};
+
+export const hasCartChanges = (activeCart, savedCart) => {
+  if (!savedCart || !activeCart) return false;
+  
+  if (activeCart.products.length !== savedCart.products.length) return true;
+  //check if the quantity of the product in the active cart is different from the quantity of the product in the saved cart 
+  return activeCart.products.some(activeProduct => {
+    const savedProduct = savedCart.products.find(p => p.productId === activeProduct.product._id);
+    return !savedProduct || savedProduct.quantity !== activeProduct.quantity;
+  });
 };
 
 export const {

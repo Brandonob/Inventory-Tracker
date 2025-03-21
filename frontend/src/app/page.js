@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { AddProductsModal } from './components/AddProductsModal';
 import { ProductCard } from './components/ProductCard';
 import { fetchAllProducts } from './redux/slices/productsSlice';
@@ -12,6 +12,7 @@ import { CartModal } from './components/CartModal';
 import { NavMenu } from './components/NavMenu';
 import Link from 'next/link';
 import { setActiveCartName, setActiveCartId, addProductToActiveCart } from './redux/slices/cartsSlice';
+import { NewCartButton } from './components/NewCartButton';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -56,8 +57,11 @@ export default function Home() {
             <Image src={pookieIcon} alt='logo' width={300} height={300} />
           </Link>
         </div>
-        <div className='flex flex-col w-3/4 '>
-          <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+        <div className='flex flex-col w-3/4'>
+          <div className='flex justify-between items-center'>
+            <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+            <NewCartButton />
+          </div>
           <AddProductsModal />
           {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
           <div className='flex flex-wrap gap-4 justify-center mt-12'>
