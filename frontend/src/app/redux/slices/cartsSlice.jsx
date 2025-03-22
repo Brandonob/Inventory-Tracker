@@ -65,6 +65,11 @@ const cartsSlice = createSlice({
     setActiveCartId: (state, action) => {
       state.activeCartId = action.payload;
     },
+    clearActiveCart: (state) => {
+      state.activeCart = { products: [] };
+      state.activeCartId = null;
+      state.activeCartName = null;  
+    },
     setActiveCartName: (state, action) => {
       state.activeCartName = action.payload;
     },
@@ -236,5 +241,6 @@ export const {
   setError,
   clearError,
   setLoadingComplete,
+  clearActiveCart,
 } = cartsSlice.actions;
 export default cartsSlice.reducer;

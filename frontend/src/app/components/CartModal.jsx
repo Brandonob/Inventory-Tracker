@@ -40,6 +40,14 @@ export const CartModal = ({ activeCart }) => {
 
   const dispatch = useDispatch();
 
+  const calculateCartTotal = () => {
+    if (!activeCart?.products?.length) return 0;
+    
+    return activeCart.products.reduce((total, cartItem) => {
+      return total + (cartItem.product.price * cartItem.quantity);
+    }, 0);
+  };
+
   const handlePurchaseClick = () => {
     setShowPurchase(true);
   };
@@ -84,7 +92,12 @@ export const CartModal = ({ activeCart }) => {
         <ModalContent>
           {showPurchase ? (
             <Slide direction='right' in={true} style={{ width: '100%' }}>
-              <PurchaseModal handleBackToCart={handleBackToCart} />
+              <PurchaseModal
+                handleBackToCart={handleBackToCart}
+                activeCart={activeCart}
+                calculateCartTotal={calculateCartTotal}
+                onClose={onClose}
+               />
             </Slide>
           ) : showSaveCart ? (
             <Slide direction='right' in={true} style={{ width: '100%' }}>
@@ -131,6 +144,9 @@ export const CartModal = ({ activeCart }) => {
                 </ModalBody>
 
                 <ModalFooter>
+                  <Text mr={4} fontWeight="bold">
+                    Total: ${calculateCartTotal().toFixed(2)}
+                  </Text>
                   <Button
                     isDisabled={isEmptyCart}
                     onClick={handleSaveCartClick}

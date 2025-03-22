@@ -11,7 +11,7 @@ import { InitializeDB } from './utils/InitializeDB';
 import { CartModal } from './components/CartModal';
 import { NavMenu } from './components/NavMenu';
 import Link from 'next/link';
-import { setActiveCartName, setActiveCartId, addProductToActiveCart } from './redux/slices/cartsSlice';
+import { setActiveCartName, setActiveCartId, addProductToActiveCart, getAllCarts } from './redux/slices/cartsSlice';
 import { NewCartButton } from './components/NewCartButton';
 
 export default function Home() {
@@ -30,6 +30,7 @@ export default function Home() {
   }, [allCarts]);
 
   useEffect(() => {
+    dispatch(getAllCarts());
     dispatch(fetchAllProducts());
     // If there's an active cart, set it in the Redux state
     if (findActiveCart) {
@@ -51,7 +52,7 @@ export default function Home() {
   return (
     <>
       <InitializeDB />
-      <div className='flex flex-col items-center justify-center bg-black'>
+      <div className='flex flex-col items-center justify-center bg-black h-full'>
         <div className='flex items-center justify-center'>
           <Link href="/">
             <Image src={pookieIcon} alt='logo' width={300} height={300} />

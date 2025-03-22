@@ -31,7 +31,6 @@ export async function GET() {
 export async function POST(req) {
   try {
     const db = await getDB();
-    debugger;
     const body = await req.json();
     const { name, description, price, quantity, image } = body;
 
