@@ -93,7 +93,7 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
     try {
       debugger;
       const stockUpdates = products.map(product => ({
-        productId: product._id,
+        productId: product.product._id,
         quantity: product.quantity
       }));
 

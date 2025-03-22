@@ -7,17 +7,30 @@ export async function PATCH(req) {
     const db = await getDB();
     const { products } = await req.json();
 
+    console.log('Received products:', products);
+
     // Update stock for each product
     const updates = await Promise.all(
       products.map(async ({ productId, quantity }) => {
+        if (!productId || !quantity) {
+          throw new Error('Invalid product data');
+        }
+        
+        const quantityNum = parseInt(quantity);
+        if (isNaN(quantityNum)) {
+          throw new Error('Invalid quantity value');
+        }
+
         const product = await db.collection('products').findOneAndUpdate(
           { _id: new ObjectId(productId) },
-          { $inc: { quantity: -parseInt(quantity) } },
+          { $inc: { quantity: -quantityNum } },
           { returnDocument: 'after' }
         );
         return product;
       })
     );
+
+    console.log('Stock updates being sent:', updates);
 
     return NextResponse.json({ 
       message: 'Stock updated successfully', 
