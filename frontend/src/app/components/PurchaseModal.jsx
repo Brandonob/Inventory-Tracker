@@ -19,6 +19,7 @@ import {
 } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { clearActiveCart } from '../redux/slices/cartsSlice';
+import { fetchAllProducts } from '../redux/slices/productsSlice';
 
 export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal, onClose }) => {
   const [showPartialAmount, setShowPartialAmount] = useState(false);
@@ -67,7 +68,9 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
       //set all modals to close
       handleBackToCart();
       //close cart modal
-      // onClose();
+      onClose();
+      //fetch all products
+      dispatch(fetchAllProducts());
       
       toast({
         title: 'Purchase Completed',

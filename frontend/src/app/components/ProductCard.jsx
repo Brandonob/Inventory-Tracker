@@ -26,6 +26,7 @@ import {
 } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { QuantitySelector } from './QuantitySelector';
+import { motion } from 'framer-motion';
 
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
@@ -121,6 +122,10 @@ export const ProductCard = ({ product }) => {
 
   return (
     <Box
+      as={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
       borderWidth='1px'
       borderRadius='lg'
       overflow='hidden'

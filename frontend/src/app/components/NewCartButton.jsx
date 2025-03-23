@@ -1,5 +1,5 @@
 'use client';
-import { Button, useToast } from '@chakra-ui/react';
+import { IconButton, useToast } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { 
   clearActiveCartProducts, 
@@ -7,6 +7,7 @@ import {
   setActiveCartName,
   hasCartChanges
 } from '../redux/slices/cartsSlice';
+import { RiAddCircleFill } from "react-icons/ri";
 
 export function NewCartButton() {
   const dispatch = useDispatch();
@@ -79,11 +80,52 @@ export function NewCartButton() {
   };
 
   return (
-    <Button
+    <IconButton
       onClick={handleNewCart}
-      colorScheme="blue"
+      height='45px'
+      width='45px'
+      borderRadius='50%'
+      bg='rgb(90 103 250)'
+      _hover={{ 
+        bg: 'rgb(25,36,173,0.3)',
+        boxShadow: '0 0 0 6px rgba(255,255,255,1)'
+      }}
+      margin='15px 30px'
+      position='relative'
+      zIndex={1}
+      color='white'
+      cursor='pointer'
+      transition='box-shadow 0.2s'
+      sx={{
+        '&::after': {
+          content: '""',
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          borderRadius: '50%',
+          boxSizing: 'content-box',
+          pointerEvents: 'none',
+          top: 0,
+          left: 0,
+          padding: 0,
+          boxShadow: '0 0 0 3px #fff',
+          transition: 'transform 0.2s, opacity 0.2s',
+        },
+        '&:hover::after': {
+          transform: 'scale(0.85)',
+          opacity: 0.5
+        }
+      }}
     >
-      New Cart
-    </Button>
+      <RiAddCircleFill 
+        className='text-[#E8E9F3]'
+        style={{
+          fontSize: '48px',
+          display: 'block',
+          lineHeight: '90px',
+          WebkitFontSmoothing: 'antialiased'
+        }}
+      />
+    </IconButton>
   );
 }

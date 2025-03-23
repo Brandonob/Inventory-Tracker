@@ -36,3 +36,22 @@ export async function POST(req) {
     return NextResponse.json({ error: 'Failed to create purchase' }, { status: 500 });
   }
 }
+
+export async function GET(req) {
+  try {
+    const db = await getDB();
+    if (!db) {
+      console.error('Database connection failed');
+      return NextResponse.json({ error: 'Database connection failed' }, { status: 500 });
+    } 
+
+    const purchases = await db.collection('purchases').find({}).toArray();
+
+    return NextResponse.json({ purchases }, { status: 200 });
+  } catch (error) {
+    console.error('Error fetching purchases:', error);
+    return NextResponse.json(
+      { error: 'Failed to fetch purchases' }, 
+      { status: 500 });
+  }
+}

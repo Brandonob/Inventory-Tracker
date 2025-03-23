@@ -36,8 +36,8 @@ export const NavMenu = () => {
             >
               Carts
             </MenuItem>
-            <MenuItem as='a' href='http://localhost:3000/orders' value='orders'>
-              Orders
+            <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
+              Purchases
             </MenuItem>
             {/* <MenuItem
               as='a'

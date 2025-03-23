@@ -19,29 +19,17 @@ import {
   AccordionPanel,
   AccordionIcon,
 } from '@chakra-ui/react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchAllPurchases } from '../redux/slices/purchaseSlice';
 
-export default function Orders() {
-  const [purchases, setPurchases] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function Purchases() {
+  const dispatch = useDispatch();
+  const { purchases, loading, error } = useSelector((state) => state.purchases);
+  console.log('purchases', purchases);
 
   useEffect(() => {
-    fetchPurchaseHistory();
+    dispatch(fetchAllPurchases());
   }, []);
-
-  const fetchPurchaseHistory = async () => {
-    try {
-      const response = await fetch('/api/purchases');
-      if (!response.ok) {
-        throw new Error('Failed to fetch purchase history');
-      }
-      const data = await response.json();
-      setPurchases(data);
-    } catch (error) {
-      console.error('Error fetching purchase history:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -77,10 +65,11 @@ export default function Orders() {
           <Card key={purchase._id} boxShadow="md">
             <CardHeader>
               <Heading size="md">
-                Order #{purchase._id.slice(-6)}
+                Order: {purchase.customerName}
+                {/* #{purchase._id.slice(-6)} */}
               </Heading>
               <Text color="gray.500" fontSize="sm">
-                {formatDate(purchase.purchaseDate)}
+                {formatDate(purchase.createdAt)}
               </Text>
             </CardHeader>
             <CardBody>
@@ -105,7 +94,7 @@ export default function Orders() {
                               </Text>
                             </VStack>
                             <Text fontSize="sm">
-                              ${(item.productPrice * item.quantity).toFixed(2)}
+                              ${(item.product.price * item.quantity).toFixed(2)}
                             </Text>
                           </HStack>
                         ))}
@@ -119,7 +108,7 @@ export default function Orders() {
                 <HStack justify="space-between" width="100%">
                   <Text>Total:</Text>
                   <Text fontWeight="bold">
-                    ${calculateTotal(purchase.products)}
+                    ${purchase.total}
                   </Text>
                 </HStack>
               </CardFooter>

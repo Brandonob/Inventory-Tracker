@@ -29,15 +29,22 @@ const purchasesSlice = createSlice({
 export const { setPurchases, setLoading, setError } = purchasesSlice.actions;
 
 // Thunk action to fetch all purchases
-export const fetchPurchaseHistory = () => async (dispatch) => {
+export const fetchAllPurchases = () => async (dispatch) => {
   dispatch(setLoading());
   try {
-    const response = await fetch('/api/purchases');
+    const response = await fetch('/api/purchases', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
     if (!response.ok) {
       throw new Error('Failed to fetch purchase history');
     }
+
     const data = await response.json();
-    dispatch(setPurchases(data));
+    dispatch(setPurchases(data.purchases || []));
   } catch (error) {
     dispatch(setError(error.message));
   }

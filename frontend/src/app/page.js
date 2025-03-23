@@ -5,7 +5,7 @@ import { ProductCard } from './components/ProductCard';
 import { fetchAllProducts } from './redux/slices/productsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
-import pookieIcon from './components/media/pookieIcon.png';
+import hb from './components/media/hb.png';
 import { InitializeDB } from './utils/InitializeDB';
 // import { SaveCartButton } from './components/SaveCart';
 import { CartModal } from './components/CartModal';
@@ -55,17 +55,19 @@ export default function Home() {
       <div className='flex flex-col items-center justify-center bg-black h-full'>
         <div className='flex items-center justify-center'>
           <Link href="/">
-            <Image src={pookieIcon} alt='logo' width={300} height={300} />
+            <Image src={hb} alt='logo' width={300} height={300} />
           </Link>
         </div>
         <div className='flex flex-col w-3/4'>
           <div className='flex justify-between items-center'>
             <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+          </div>
+          <div className='flex items-center'>
+            <AddProductsModal />
             <NewCartButton />
           </div>
-          <AddProductsModal />
           {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
-          <div className='flex flex-wrap gap-4 justify-center mt-12'>
+          <div className='flex flex-wrap gap-4 justify-center mt-12 rounded-3xl bg-[rgb(90,103,250)] p-8'>
             {productsInStock.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
