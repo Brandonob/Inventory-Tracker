@@ -6,11 +6,30 @@ import {
   MenuButton,
   MenuList,
   IconButton,
+  useToast,
 } from '@chakra-ui/react';
 import { ImMenu3 } from 'react-icons/im';
-// import { ImMenu4 } from 'react-icons/im';
+// import { useRouter } from 'next/navigation';
+import { useDispatch } from 'react-redux';
+import { clearUser } from '../redux/slices/usersSlice';
 
 export const NavMenu = () => {
+  // const router = useRouter();
+  const dispatch = useDispatch();
+  const toast = useToast();
+
+  const handleLogout = () => {
+    localStorage.removeItem('user');
+    dispatch(clearUser());
+
+    toast({
+      title: 'Logged out',
+      description: 'You have been logged out',
+      status: 'success',
+      duration: 3000,
+    });
+  };
+
   return (
     <>
       <div className='fixed top-0 right-0 m-4'>
@@ -39,13 +58,13 @@ export const NavMenu = () => {
             <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
               Purchases
             </MenuItem>
-            {/* <MenuItem
-              as='a'
-              href='https://www.crunchyroll.com/attack-on-titan'
-              value='attack-on-titan'
+            <MenuItem
+              as='button'
+              onClick={handleLogout}
+              value='logout'
             >
-              Attack on Titan
-            </MenuItem> */}
+              Logout
+            </MenuItem>
           </MenuList>
         </Menu>
       </div>

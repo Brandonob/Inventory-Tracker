@@ -19,29 +19,35 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const router = useRouter();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // debugger;
+    debugger;
 
     const user = { userName, password };
     console.log('Sending login request with:', user);
 
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-    });
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('user logged in!', data);
-      dispatch(setUser(data));
-      router.push('/');
-    } else {
-      const errorData = await response.json();
-      console.log('Error logging in user:', errorData);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('user logged in!', data);
+        dispatch(setUser(data));
+        localStorage.setItem('user', JSON.stringify(data));
+        router.push('/');
+      } else {
+        const errorData = await response.json();
+        console.error('Error logging in:', errorData.error);
+      }
+    } catch (error) {
+      console.error('Failed to login:', error);
     }
   };
 
