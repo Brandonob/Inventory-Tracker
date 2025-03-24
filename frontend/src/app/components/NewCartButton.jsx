@@ -7,7 +7,7 @@ import {
   setActiveCartName,
   hasCartChanges
 } from '../redux/slices/cartsSlice';
-import { RiAddCircleFill } from "react-icons/ri";
+import { BsCartX } from "react-icons/bs";
 
 export function NewCartButton() {
   const dispatch = useDispatch();
@@ -117,10 +117,10 @@ export function NewCartButton() {
         }
       }}
     >
-      <RiAddCircleFill 
+      <BsCartX 
         className='text-[#E8E9F3]'
         style={{
-          fontSize: '48px',
+          fontSize: '26px',
           display: 'block',
           lineHeight: '90px',
           WebkitFontSmoothing: 'antialiased'

@@ -17,7 +17,9 @@ import {
   useDisclosure,
   NumberInputField,
   useToast,
+  IconButton,
 } from '@chakra-ui/react';
+import { RiAddCircleFill } from "react-icons/ri";
 // import { useDispatch } from 'react-redux';
 // import { addProduct } from '../redux/slices/productsSlice';
 // import { loadComponents } from 'next/dist/server/load-components';
@@ -140,9 +142,53 @@ export const AddProductsModal = () => {
 
   return (
     <>
-      <Button onClick={onOpen} colorScheme='blue' className='w-28'>
-        Add Item
-      </Button>
+      <IconButton 
+        onClick={onOpen} 
+        height='45px'
+        width='45px'
+        borderRadius='50%'
+        bg='rgb(90 103 250)'
+        _hover={{ 
+          bg: 'rgb(25,36,173,0.3)',
+          boxShadow: '0 0 0 6px rgba(255,255,255,1)'
+        }}
+        margin='15px 30px'
+        position='relative'
+        zIndex={1}
+        color='white'
+        cursor='pointer'
+        transition='box-shadow 0.2s'
+        sx={{
+          '&::after': {
+            content: '""',
+            position: 'absolute',
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            boxSizing: 'content-box',
+            pointerEvents: 'none',
+            top: 0,
+            left: 0,
+            padding: 0,
+            boxShadow: '0 0 0 3px #fff',
+            transition: 'transform 0.2s, opacity 0.2s',
+          },
+          '&:hover::after': {
+            transform: 'scale(0.85)',
+            opacity: 0.5
+          }
+        }}
+      >
+       <RiAddCircleFill 
+        className='text-[#E8E9F3]'
+        style={{
+          fontSize: '48px',
+          display: 'block',
+          lineHeight: '90px',
+          WebkitFontSmoothing: 'antialiased'
+        }}
+      />
+      </IconButton>
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />

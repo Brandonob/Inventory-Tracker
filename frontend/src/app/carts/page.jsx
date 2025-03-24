@@ -29,7 +29,7 @@ import {
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
-import pookieIcon from '../components/media/pookieIcon.png';
+import hb from '../components/media/hb.png';
 import Link from 'next/link';
 
 export default function Cart() {
@@ -298,17 +298,20 @@ export default function Cart() {
   }, [allCarts]);
 
   return (
-    <Box p={5}>
+    <Box 
+    p={5}
+    backgroundColor={'black'}
+    height={'100vh'}>
       <Box display="flex" justifyContent="center" mb={4}>
-        <Link href="/">
-          <Image src={pookieIcon} alt='logo' width={300} height={300} />
-        </Link>
+      <Link href="/">
+            <Image src={hb} alt='logo' width={300} height={300} />
+          </Link>
       </Box>
-      <Heading mb={4}>Shopping Carts</Heading>
-      <Text mb={4}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
+      <Heading mb={4} color={'white'}>Shopping Carts</Heading>
+      <Text mb={4} color={'white'}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
         {allCarts.length === 0 ? (
-          <Text>No carts saved!</Text>
+          <Text color={'white'}>No carts saved!</Text>
         ) : (
           allCarts.map((cart, index) => (
             <Card
