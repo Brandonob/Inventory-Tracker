@@ -22,6 +22,7 @@ export default function Home() {
   const activeCart = useSelector((state) => state.carts.activeCart);
   const activeCartProducts = activeCart?.products || [];
   const activeCartId = useSelector((state) => state.carts.activeCartId);
+  const user = useSelector((state) => state.users.user.length > 0);
   const dispatch = useDispatch();
 
   // Add memoized function to find active cart
@@ -63,7 +64,7 @@ export default function Home() {
             <h1 className='text-4xl font-bold text-white'>In Stock</h1>
           </div>
           <div className='flex items-center'>
-            <AddProductsModal />
+            {user && <AddProductsModal />}
             <NewCartButton />
           </div>
           {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
@@ -75,7 +76,7 @@ export default function Home() {
         </div>
         <CartModal activeCart={activeCart || { products: [] }} />
         {/* <CartPreviewModal activeCart={activeCart} /> */}
-        <NavMenu />
+        {user && <NavMenu />}
       </div>
     </>
   );
