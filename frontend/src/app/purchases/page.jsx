@@ -25,6 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPurchases } from '../redux/slices/purchaseSlice';
 import Image from 'next/image';
 import hb from '../components/media/hb.png';
+import hbaby from '../components/media/hbaby.png';
 import Link from 'next/link'; 
 
 export default function Purchases() {
@@ -80,11 +81,12 @@ export default function Purchases() {
       </Box>
     );
   }
+
   return(
   <Box 
   p={5}
   backgroundColor={'black'}
-  height={'100vh'}
+  minHeight={'100vh'}
   >
     <Box display="flex" justifyContent="center" mb={4}>
       <Link href="/">
@@ -193,6 +195,11 @@ export default function Purchases() {
           ))}
         </SimpleGrid>
       )}
+        <Box display="flex" justifyContent="center" mb={4}>
+          <Link href="/">
+            <Image src={hbaby} alt='logo' width={300} height={300} />
+          </Link>
+      </Box>
     </Box>
   );
 }

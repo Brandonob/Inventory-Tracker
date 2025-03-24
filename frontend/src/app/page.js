@@ -6,6 +6,8 @@ import { fetchAllProducts } from './redux/slices/productsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
 import hb from './components/media/hb.png';
+import hbaby from './components/media/hbaby.png';
+import { Box } from '@chakra-ui/react';
 import { InitializeDB } from './utils/InitializeDB';
 // import { SaveCartButton } from './components/SaveCart';
 import { CartModal } from './components/CartModal';
@@ -13,6 +15,7 @@ import { NavMenu } from './components/NavMenu';
 import Link from 'next/link';
 import { setActiveCartName, setActiveCartId, addProductToActiveCart, getAllCarts } from './redux/slices/cartsSlice';
 import { NewCartButton } from './components/NewCartButton';
+import Tilt from 'react-parallax-tilt';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -77,6 +80,13 @@ export default function Home() {
         <CartModal activeCart={activeCart || { products: [] }} />
         {/* <CartPreviewModal activeCart={activeCart} /> */}
         {user && <NavMenu />}
+        <Tilt>
+          <Box display="flex" justifyContent="center" mb={4}>
+            <Link href="/">
+              <Image src={hbaby} alt='logo' width={300} height={300} />
+            </Link>
+          </Box>
+        </Tilt>
       </div>
     </>
   );
