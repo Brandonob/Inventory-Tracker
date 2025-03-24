@@ -56,11 +56,11 @@ export const QuantitySelector = ({ cartItem }) => {
 
   return (
     <HStack maxW='320px'>
-      <Button onClick={handleDecrement} {...decrement}>
+      <Button borderRadius={'50%'} onClick={handleDecrement} {...decrement}>
         -
       </Button>
-      <Input {...input} />
-      <Button onClick={handleIncrement} {...increment}>
+      <Input width={'40px'} {...input} />
+      <Button borderRadius={'50%'} onClick={handleIncrement} {...increment}>
         +
       </Button>
     </HStack>

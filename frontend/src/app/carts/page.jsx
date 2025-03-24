@@ -301,11 +301,12 @@ export default function Cart() {
     <Box 
     p={5}
     backgroundColor={'black'}
-    height={'100vh'}>
+    height={'100vh'}
+    >
       <Box display="flex" justifyContent="center" mb={4}>
-      <Link href="/">
-            <Image src={hb} alt='logo' width={300} height={300} />
-          </Link>
+        <Link href="/">
+          <Image src={hb} alt='logo' width={300} height={300} />
+        </Link>
       </Box>
       <Heading mb={4} color={'white'}>Shopping Carts</Heading>
       <Text mb={4} color={'white'}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>

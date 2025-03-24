@@ -18,18 +18,44 @@ import {
   AccordionButton,
   AccordionPanel,
   AccordionIcon,
+  ButtonGroup,
+  Button,
 } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPurchases } from '../redux/slices/purchaseSlice';
+import Image from 'next/image';
+import hb from '../components/media/hb.png';
+import Link from 'next/link'; 
 
 export default function Purchases() {
   const dispatch = useDispatch();
   const { purchases, loading, error } = useSelector((state) => state.purchases);
-  console.log('purchases', purchases);
+  const [timeFilter, setTimeFilter] = useState('all');
+  const [filteredPurchases, setFilteredPurchases] = useState([]);
 
   useEffect(() => {
     dispatch(fetchAllPurchases());
   }, []);
+
+  useEffect(() => {
+    if (!purchases) return;
+    
+    const now = new Date();
+    const filtered = purchases.filter(purchase => {
+      const purchaseDate = new Date(purchase.createdAt);
+      switch (timeFilter) {
+        case '24h':
+          return (now - purchaseDate) <= 24 * 60 * 60 * 1000;
+        case 'week':
+          return (now - purchaseDate) <= 7 * 24 * 60 * 60 * 1000;
+        case 'month':
+          return (now - purchaseDate) <= 30 * 24 * 60 * 60 * 1000;
+        default:
+          return true;
+      }
+    });
+    setFilteredPurchases(filtered);
+  }, [purchases, timeFilter]);
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -50,27 +76,78 @@ export default function Purchases() {
   if (loading) {
     return (
       <Box p={5} display="flex" justifyContent="center">
-        <Text>Loading purchase history...</Text>
+        <Text color={'white'}>Loading purchase history...</Text>
       </Box>
     );
   }
   return(
-  <Box p={5}>
-    <Heading mb={6}>Purchase History</Heading>
-    {purchases.length === 0 ? (
-      <Text>No purchase history available</Text>
+  <Box 
+  p={5}
+  backgroundColor={'black'}
+  height={'100vh'}
+  >
+    <Box display="flex" justifyContent="center" mb={4}>
+      <Link href="/">
+        <Image src={hb} alt='logo' width={300} height={300} />
+      </Link>
+    </Box>
+    <Heading color={'white'} mb={6}>Purchase History</Heading>
+    
+    <ButtonGroup spacing={4} mb={6}>
+      <Button
+        colorScheme={timeFilter === '24h' ? 'blue' : 'gray'}
+        onClick={() => setTimeFilter('24h')}
+      >
+        Last 24 Hours
+      </Button>
+      <Button
+        colorScheme={timeFilter === 'week' ? 'blue' : 'gray'}
+        onClick={() => setTimeFilter('week')}
+      >
+        Past Week
+      </Button>
+      <Button
+        colorScheme={timeFilter === 'month' ? 'blue' : 'gray'}
+        onClick={() => setTimeFilter('month')}
+      >
+        Past Month
+      </Button>
+      <Button
+        colorScheme={timeFilter === 'all' ? 'blue' : 'gray'}
+        onClick={() => setTimeFilter('all')}
+      >
+        All Time
+      </Button>
+    </ButtonGroup>
+
+    {filteredPurchases.length === 0 ? (
+      <Text color={'white'}>No purchase history available</Text>
     ) : (
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-        {purchases.map((purchase) => (
+        {filteredPurchases.map((purchase) => (
           <Card key={purchase._id} boxShadow="md">
-            <CardHeader>
-              <Heading size="md">
-                Order: {purchase.customerName}
-                {/* #{purchase._id.slice(-6)} */}
-              </Heading>
-              <Text color="gray.500" fontSize="sm">
-                {formatDate(purchase.createdAt)}
-              </Text>
+            <CardHeader display="flex" justifyContent="space-between">
+              <div className=''>
+                <Heading size="md">
+                  Order: {purchase.customerName}
+                  {/* #{purchase._id.slice(-6)} */}
+                </Heading>
+                <Text color="gray.500" fontSize="sm">
+                  {formatDate(purchase.createdAt)}
+                </Text>
+              </div>
+              <div className='flex justify-center items-center h-[40px] w-[70px]'>
+                {purchase.status === 'pending' && (
+                  <Badge colorScheme='red'>Pending</Badge>
+                )}
+                {purchase.status === 'partial' && (
+                  <Badge colorScheme='yellow'>Partial</Badge>
+                ) }
+                {purchase.status === 'paid' && (
+                  <Badge colorScheme='green'>Paid</Badge>
+                )}
+
+              </div>
             </CardHeader>
             <CardBody>
               <Accordion allowMultiple>
@@ -88,7 +165,7 @@ export default function Purchases() {
                         {purchase.products.map((item, index) => (
                           <HStack key={index} justify="space-between">
                             <VStack align="start" spacing={0}>
-                              <Text fontSize="sm">{item.productName}</Text>
+                              <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
                               <Text fontSize="xs" color="gray.500">
                                 Qty: {item.quantity}
                               </Text>
