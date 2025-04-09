@@ -1,4 +1,5 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import {
   Button,
   Menu,
@@ -14,7 +15,7 @@ import { useDispatch } from 'react-redux';
 import { clearUser } from '../redux/slices/usersSlice';
 
 export const NavMenu = () => {
-  // const router = useRouter();
+  const user = useSelector((state) => state.users.user.length > 0);
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -32,7 +33,7 @@ export const NavMenu = () => {
 
   return (
     <>
-      <div className='fixed top-0 right-0 m-4'>
+      <div className='fixed top-0 left-0 m-4'>
         <Menu>
           <MenuButton
             as={Button}
@@ -43,28 +44,42 @@ export const NavMenu = () => {
             alignItems='center'
             justifyContent='center'
             p={2}
-            _hover={{ '& svg': { color: '#FACC15' } }} // Using Chakra's hover style to target the SVG
+            _hover={{ '& svg': { color: '#F7B578' } }} // Using Chakra's hover style to target the SVG
           >
             <ImMenu3 className='text-white text-4xl h-6 w-6 transition-colors' />
           </MenuButton>
           <MenuList>
-            <MenuItem
-              as='a'
-              href='http://localhost:3000/carts'
-              value='savedCarts'
-            >
-              Carts
-            </MenuItem>
-            <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
-              Purchases
-            </MenuItem>
-            <MenuItem
-              as='button'
-              onClick={handleLogout}
-              value='logout'
-            >
-              Logout
-            </MenuItem>
+
+            {user && (
+              <>
+                <MenuItem
+                  as='a'
+                  href='http://localhost:3000/carts'
+                  value='savedCarts'
+                >
+                  Carts
+                </MenuItem>
+                <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
+                  Purchases
+                </MenuItem>
+                <MenuItem
+                  as='button'
+                  onClick={handleLogout}
+                  value='logout'
+                >
+                  Logout
+                </MenuItem>
+              </>
+            )}
+            {!user && (
+              <MenuItem
+                as='a'
+                href='http://localhost:3000/login'
+                value='login'
+              >
+                Login
+              </MenuItem>
+            )}
           </MenuList>
         </Menu>
       </div>

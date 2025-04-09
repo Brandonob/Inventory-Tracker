@@ -126,13 +126,13 @@ export const ProductCard = ({ product }) => {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.5 }}
-      borderWidth='1px'
+      borderWidth='2px'
       borderRadius='lg'
       overflow='hidden'
       boxShadow='md'
       p={4}
       bg='white'
-      _hover={{ boxShadow: 'xl' }}
+      _hover={{ boxShadow: 'xl', borderColor: 'rgb(90, 103, 250)' }}
       className='w-80 h-[365px]'
     >
       {console.log('product card!', product)}

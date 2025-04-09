@@ -70,13 +70,13 @@ export const CartModal = ({ activeCart }) => {
         bg='gray.400'
         rounded='20px'
         position='fixed'
-        bottom='0px'
+        top='0px'
         right='0px'
         margin='16px'
         height='40px'
         width='40px'
         p={2}
-        _hover={{ '& svg': { color: '#FACC15' } }} // Using Chakra's hover style to target the SVG
+        _hover={{ '& svg': { color: '#F7B578' } }} // Using Chakra's hover style to target the SVG
       >
         <IoBagCheckOutline
           size={24}

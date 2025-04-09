@@ -9,10 +9,12 @@ import {
   FormLabel,
   VStack,
   Heading,
+  Text,
 } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/slices/usersSlice';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Login() {
   const [userName, setUserName] = useState('');
@@ -88,6 +90,14 @@ export default function Login() {
           <Button colorScheme='blue' type='submit' width='full'>
             Login
           </Button>
+          <Text mt={2} textAlign='center'>
+            Don't have an account?{' '}
+            <Link href='/signup'>
+              <Button variant='link' colorScheme='blue'>
+                Sign Up
+              </Button>
+            </Link>
+          </Text>
         </VStack>
       </form>
     </Box>
