@@ -16,6 +16,7 @@ import Link from 'next/link';
 import { setActiveCartName, setActiveCartId, addProductToActiveCart, getAllCarts } from './redux/slices/cartsSlice';
 import { NewCartButton } from './components/NewCartButton';
 import Tilt from 'react-parallax-tilt';
+import { LoadingScreen } from './components/ProductCardLoadingState';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -59,42 +60,45 @@ export default function Home() {
   return (
     <>
       <InitializeDB />
-        <div className='flex flex-col items-center justify-center bg-black h-full'>
-          <div className='flex items-center justify-center'>
-            <Link href="/">
-              <Image src={hb} alt='logo' width={300} height={300} />
-            </Link>
-          </div>
-          <div className='flex flex-col w-3/4'>
-            <div className='flex justify-between items-center'>
-              <h1 className='text-4xl font-bold text-white'>In Stock</h1>
-            </div>
-            <div className='flex items-center'>
-              {user && <AddProductsModal />}
-              <NewCartButton />
-            </div>
-            {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
-            <div className='bg-white rounded-3xl' mt-12>
-            <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
-              shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
-              {productsInStock.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
-            </div>
-            </div>
-          </div>
-          <CartModal activeCart={activeCart || { products: [] }} />
-          {/* <CartPreviewModal activeCart={activeCart} /> */}
-           <NavMenu />
-          <Tilt>
-            <Box display="flex" justifyContent="center" mb={4}>
-              <Link href="/">
-                <Image src={hbaby} alt='logo' width={300} height={300} />
-              </Link>
-            </Box>
-          </Tilt>
+      <div className='flex flex-col items-center justify-center bg-black h-full'>
+        <div className='flex items-center justify-center'>
+          <Link href="/">
+            <Image src={hb} alt='logo' width={300} height={300} />
+          </Link>
         </div>
-      
+        <div className='flex flex-col w-3/4'>
+          <div className='flex justify-between items-center'>
+            <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+          </div>
+          <div className='flex items-center'>
+            {user && <AddProductsModal />}
+            <NewCartButton />
+          </div>
+          {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
+          <div className='bg-white rounded-3xl mt-12'>
+            {loading ? (
+              <LoadingScreen />
+            ) : (
+              <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
+                shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
+                {productsInStock.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+        <CartModal activeCart={activeCart || { products: [] }} />
+        {/* <CartPreviewModal activeCart={activeCart} /> */}
+        <NavMenu />
+        <Tilt>
+          <Box display="flex" justifyContent="center" mb={4}>
+            <Link href="/">
+              <Image src={hbaby} alt='logo' width={300} height={300} />
+            </Link>
+          </Box>
+        </Tilt>
+      </div>
     </>
   );
 }

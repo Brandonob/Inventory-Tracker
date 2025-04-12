@@ -308,52 +308,54 @@ export default function Cart() {
           <Image src={hb} alt='logo' width={300} height={300} />
         </Link>
       </Box>
-      <Heading mb={4} color={'white'}>Shopping Carts</Heading>
-      <Text mb={4} color={'white'}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
-        {allCarts.length === 0 ? (
-          <Text color={'white'}>No carts saved!</Text>
-        ) : (
-          allCarts.map((cart, index) => (
-            <Card
-              key={index}
-              boxShadow='md'
-              borderRadius='lg'
-              overflow='hidden'
-            >
-              <CardBody>
-                <Heading size='md' mb={2}>
-                  {`${cart.cartName || 'Untitled'} Cart`}
-                </Heading>
-                <Text mb={2}>Items: {cart.products.length}</Text>
-                <Text fontWeight='bold' color='green.500'>
-                  Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
-                </Text>
-                {/* Prompt user to save current cart before setting a new one */} 
-                <Button
-                  onClick={() => activeCart.length > 0 ? toast({
-                    title: 'Save Cart ',
-                    description: 'Please save your current cart before setting a new one',
-                    status: 'error',
-                    duration: 3000, 
-                  }) : handleSetActiveCartBtn(cart)}
-                  mt={3}
-                  colorScheme='blue'
-                >
-                  Set Active Cart
-                </Button>
-                <Button
-                  onClick={() => handleDeleteCart(cart._id)}
-                  mt={3}
-                  colorScheme='red'
-                >
-                  Delete Cart
-                </Button>
-              </CardBody>
-            </Card>
-          ))
-        )}
-      </SimpleGrid>
+      <div className='w-[90%] mx-auto'>
+        <Heading mb={4} color={'white'}>Shopping Carts</Heading>
+        <Text mb={4} color={'white'}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
+          {allCarts.length === 0 ? (
+            <Text color={'white'}>No carts saved!</Text>
+          ) : (
+            allCarts.map((cart, index) => (
+              <Card
+                key={index}
+                boxShadow='md'
+                borderRadius='lg'
+                overflow='hidden'
+              >
+                <CardBody>
+                  <Heading size='md' mb={2}>
+                    {`${cart.cartName || 'Untitled'} Cart`}
+                  </Heading>
+                  <Text mb={2}>Items: {cart.products.length}</Text>
+                  <Text fontWeight='bold' color='green.500'>
+                    Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
+                  </Text>
+                  {/* Prompt user to save current cart before setting a new one */} 
+                  <Button
+                    onClick={() => activeCart.length > 0 ? toast({
+                      title: 'Save Cart ',
+                      description: 'Please save your current cart before setting a new one',
+                      status: 'error',
+                      duration: 3000, 
+                    }) : handleSetActiveCartBtn(cart)}
+                    mt={3}
+                    colorScheme='blue'
+                  >
+                    Set Active Cart
+                  </Button>
+                  <Button
+                    onClick={() => handleDeleteCart(cart._id)}
+                    mt={3}
+                    colorScheme='red'
+                  >
+                    Delete Cart
+                  </Button>
+                </CardBody>
+              </Card>
+            ))
+          )}
+        </SimpleGrid>
+      </div>
     </Box>
   );
 }

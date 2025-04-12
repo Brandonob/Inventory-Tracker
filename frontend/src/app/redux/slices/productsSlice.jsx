@@ -32,7 +32,6 @@ const productsSlice = createSlice({
 export const fetchAllProducts = () => async (dispatch) => {
   try {
     dispatch(setLoading());
-    // debugger;
 
     const response = await fetch('/api/products', {
       method: 'GET',
@@ -51,6 +50,7 @@ export const fetchAllProducts = () => async (dispatch) => {
     }
   } catch (error) {
     console.error('Error fetching products:', error);
+    dispatch(setError(error.message));
   }
 };
 
