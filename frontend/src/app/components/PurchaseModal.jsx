@@ -1,4 +1,4 @@
-import { useState, useSelector } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Button,
@@ -17,14 +17,14 @@ import {
   Switch,
   useToast,
 } from '@chakra-ui/react';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearActiveCart } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 
 export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal, onClose }) => {
   const user = useSelector(state => state.users.user);
   const [showPartialAmount, setShowPartialAmount] = useState(false);
-  const [customerName, setCustomerName] = useState(user?.name || '');
+  const [customerName, setCustomerName] = useState(user?.userName || '');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [partialPaymentAmount, setPartialPaymentAmount] = useState(0);
   const toast = useToast();
@@ -34,8 +34,8 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
 
   const handlePurchase = async (e) => {
     e.preventDefault();
+    debugger;
     try {
-      debugger;
       const purchaseData = {
         customerName: customerName,
         cartId: activeCart.activeCartId || null,
@@ -73,8 +73,8 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
       handleBackToCart();
       //close cart modal
       onClose();
-      //fetch all products
-      dispatch(fetchAllProducts());
+      //fetch all products if admin creates purchase
+      user?.isAdmin && dispatch(fetchAllProducts());
       
       toast({
         title: 'Purchase Completed',

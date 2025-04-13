@@ -10,7 +10,6 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { ImMenu3 } from 'react-icons/im';
-// import { useRouter } from 'next/navigation';
 import { useDispatch } from 'react-redux';
 import { clearUser } from '../redux/slices/usersSlice';
 
@@ -52,13 +51,15 @@ export const NavMenu = () => {
           <MenuList>
             {isLoggedIn ? (
               <>
-                <MenuItem
-                  as='a'
-                  href='http://localhost:3000/carts'
-                  value='savedCarts'
-                >
-                  Carts
-                </MenuItem>
+                {user?.isAdmin && (
+                  <MenuItem
+                    as='a'
+                    href='http://localhost:3000/carts'
+                    value='savedCarts'
+                  >
+                    Carts
+                  </MenuItem>
+                )}
                 <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
                   Purchases
                 </MenuItem>
