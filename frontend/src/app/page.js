@@ -90,7 +90,6 @@ export default function Home() {
           </div>
         </div>
         <CartModal activeCart={activeCart || { products: [] }} />
-        {/* <CartPreviewModal activeCart={activeCart} /> */}
         <NavMenu />
         <Tilt>
           <Box display="flex" justifyContent="center" mb={4}>

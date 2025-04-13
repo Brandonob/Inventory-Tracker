@@ -42,10 +42,10 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
         products: activeCart.products,
         total: calculateCartTotal(),
         paymentMethod: paymentMethod,
-        partialPaymentAmount: partialPaymentAmount,
+        partialPaymentAmount: partialPaymentAmount === 0 ? null : partialPaymentAmount,
         paymentStatus: partialPaymentAmount > 0 ? 'partial' : 'paid',
         status: user?.isAdmin ? 'approved' : 'pending',
-        ownerId: user?._id,
+        ownerId: user?._id || null,
         createdAt: new Date(),
       };
     

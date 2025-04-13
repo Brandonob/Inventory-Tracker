@@ -51,6 +51,12 @@ export const NavMenu = () => {
           <MenuList>
             {isLoggedIn ? (
               <>
+                <MenuItem 
+                  as='a' 
+                  href='http://localhost:3000/'
+                >
+                  Home
+                </MenuItem>
                 {user?.isAdmin && (
                   <MenuItem
                     as='a'

@@ -1,35 +1,47 @@
 import { NextResponse } from 'next/server';
 import { getDB } from '../../../../lib/db';
+import { ObjectId } from 'mongodb';
 
 export async function POST(req) {
   try {
     const db = await getDB();
 
-  const body = await req.json();
+    const body = await req.json();
 
-  if (!body) {  
-    return NextResponse.json({ error: 'No body provided' }, { status: 400 });
-  }
+    if (!body) {  
+      return NextResponse.json({ error: 'No body provided' }, { status: 400 });
+    }
 
-  const { customerName, cartId, products, total, paymentMethod, partialPaymentAmount, status, paymentStatus } = body;
+    const { 
+      customerName, 
+      cartId, 
+      products, 
+      total, 
+      paymentMethod, 
+      partialPaymentAmount, 
+      status, 
+      paymentStatus,
+      ownerId
+    } = body;
 
-  if (!products || !total || !paymentMethod || !status || !paymentStatus) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
-  } 
+    if (!products || !total || !paymentMethod || !status || !paymentStatus) {
+      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    } 
 
-  const purchase = {
-    customerName: customerName,
-    cartId: cartId,
-    products: products,
-    total: total,
-    paymentMethod: paymentMethod,
-    partialPaymentAmount: partialPaymentAmount,
-    status: status,
-    paymentStatus: paymentStatus,
-    createdAt: new Date(),
-  };
+    const purchase = {
+      customerName: customerName,
+      cartId: cartId,
+      products: products,
+      total: total,
+      paymentMethod: paymentMethod,
+      partialPaymentAmount: partialPaymentAmount,
+      status: status,
+      paymentStatus: paymentStatus,
+      ownerId: new ObjectId(ownerId),
+      createdAt: new Date(),
+    };
 
-  await db.collection('purchases').insertOne(purchase);
+    await db.collection('purchases').insertOne(purchase);
 
     return NextResponse.json({ message: 'Purchase created successfully' }, { status: 201 });
   } catch (error) {

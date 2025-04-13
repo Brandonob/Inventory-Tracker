@@ -27,12 +27,15 @@ import Image from 'next/image';
 import hb from '../components/media/hb.png';
 import hbaby from '../components/media/hbaby.png';
 import Link from 'next/link'; 
+import Tilt from 'react-parallax-tilt';
+import { NavMenu } from '../components/NavMenu';
+import { CartModal } from '../components/CartModal';
 
 export default function Purchases() {
   const dispatch = useDispatch();
   const { purchases, loading, error } = useSelector((state) => state.purchases);
   const user = useSelector(state => state.users.user);
-  
+  const activeCart = useSelector((state) => state.carts.activeCart);
   
   
   const [timeFilter, setTimeFilter] = useState('all');
@@ -49,7 +52,13 @@ export default function Purchases() {
     if (!purchases) return;
     
     const now = new Date();
-    const filtered = purchases.filter(purchase => {
+    // Filter purchases based on user role and ownership
+    const userAccessFilter = user?.isAdmin 
+      ? purchases // Admin sees all purchases
+      : purchases.filter(purchase => purchase.ownerId === user?._id); // Non-admin sees only their purchases
+
+    // Then filter by time
+    const filtered = userAccessFilter.filter(purchase => {
       const purchaseDate = new Date(purchase.createdAt);
       switch (timeFilter) {
         case '24h':
@@ -68,7 +77,7 @@ export default function Purchases() {
       pendingPurchases: filtered.filter(p => p.status === 'pending'),
       approvedPurchases: filtered.filter(p => p.status !== 'pending')
     });
-  }, [purchases, timeFilter]);
+  }, [purchases, timeFilter, user]);
 
   const handleApprove = async (purchaseId) => {
     try {
@@ -131,7 +140,9 @@ export default function Purchases() {
         <Image src={hb} alt='logo' width={300} height={300} />
       </Link>
     </Box>
-    <Heading color={'white'} mb={6}>Purchase History</Heading>
+    <Heading color={'white'} mb={6}>
+      {user?.isAdmin ? 'Purchase History' : 'My Purchase History'}
+    </Heading>
     
     <ButtonGroup spacing={4} mb={6}>
       <Button
@@ -160,39 +171,32 @@ export default function Purchases() {
       </Button>
     </ButtonGroup>
 
-    {user.isAdmin && filteredPurchases.pendingPurchases.length > 0 && (
+    {filteredPurchases.pendingPurchases.length > 0 && (
       <>
-        <Heading color={'white'} mb={6}>Pending Approvals</Heading>
+        <Heading color={'white'} mb={6}>
+          {user?.isAdmin ? 'Pending Approvals' : 'Pending Purchases'}
+        </Heading>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {filteredPurchases.pendingPurchases.map((purchase) => (
             <Card key={purchase._id} boxShadow="md">
               <CardHeader display="flex" justifyContent="space-between">
-                <div className=''>
+                <div>
                   <Heading size="md">
                     Order: {purchase.customerName}
-                    {/* #{purchase._id.slice(-6)} */}
                   </Heading>
                   <Text color="gray.500" fontSize="sm">
                     {formatDate(purchase.createdAt)}
                   </Text>
                 </div>
                 <div className='flex justify-center items-center gap-2'>
-                  {/* <Badge colorScheme={
-                    purchase.status === 'pending' ? 'red' :
-                    purchase.status === 'approved' ? 'green' :
-                    'gray'
-                  }>
+                  <Badge colorScheme='red'>
                     {purchase.status}
-                  </Badge> */}
-                  {/* {purchase.status === 'pending' && (
-                    <Badge colorScheme='red'>Pending</Badge>
-                  )}
-                  {purchase.status === 'partial' && (
-                    <Badge colorScheme='yellow'>Partial</Badge>
-                  ) }
-                  {purchase.status === 'paid' && (
-                    <Badge colorScheme='green'>Paid</Badge>
-                  )} */}
+                  </Badge>
+                  <Badge colorScheme={
+                    purchase.paymentStatus === 'partial' ? 'yellow' : 'green'
+                  }>
+                    {purchase.paymentStatus}
+                  </Badge>
                 </div>
               </CardHeader>
               <CardBody>
@@ -228,14 +232,23 @@ export default function Purchases() {
                 </CardBody>
                 <Divider />
                 <CardFooter>
-                  <ButtonGroup spacing={2}>
-                    <Button colorScheme="green" onClick={() => handleApprove(purchase._id)}>
-                      Approve
-                    </Button>
-                    <Button colorScheme="red" onClick={() => handleDecline(purchase._id)}>
-                      Decline
-                    </Button>
-                  </ButtonGroup>
+                  {user?.isAdmin ? (
+                    <ButtonGroup spacing={2}>
+                      <Button colorScheme="green" onClick={() => handleApprove(purchase._id)}>
+                        Approve
+                      </Button>
+                      <Button colorScheme="red" onClick={() => handleDecline(purchase._id)}>
+                        Decline
+                      </Button>
+                    </ButtonGroup>
+                  ) : (
+                    <HStack justify="space-between" width="100%">
+                      <Text>Total:</Text>
+                      <Text fontWeight="bold">
+                        ${purchase.total}
+                      </Text>
+                    </HStack>
+                  )}
                 </CardFooter>
               </Card>
             ))}
@@ -244,7 +257,7 @@ export default function Purchases() {
       )}
 
       <Heading color={'white'} mb={6}>
-        {user.isAdmin ? 'All Approved Purchases' : 'Your Purchases'}
+        {user?.isAdmin ? 'All Approved Purchases' : 'My Approved Purchases'}
       </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
         {filteredPurchases.approvedPurchases.map((purchase) => (
@@ -319,11 +332,15 @@ export default function Purchases() {
             </Card>
           ))}
         </SimpleGrid>
-        <Box display="flex" justifyContent="center" mb={4}>
-          <Link href="/">
-            <Image src={hbaby} alt='logo' width={300} height={300} />
-          </Link>
-      </Box>
+        <CartModal activeCart={activeCart || { products: [] }} />
+        <NavMenu />
+        <Tilt>
+          <Box display="flex" justifyContent="center" mb={4}>
+            <Link href="/">
+              <Image src={hbaby} alt='logo' width={300} height={300} />
+            </Link>
+          </Box>
+        </Tilt>
     </Box>
   );
 }
