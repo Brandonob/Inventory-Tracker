@@ -41,7 +41,7 @@ export default function Login() {
       if (response.ok) {
         const data = await response.json();
         console.log('user logged in!', data);
-        dispatch(setUser([data]));
+        dispatch(setUser(data));
         localStorage.setItem('user', JSON.stringify(data));
         router.push('/');
       } else {

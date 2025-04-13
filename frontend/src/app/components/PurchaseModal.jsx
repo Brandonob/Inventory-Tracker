@@ -22,12 +22,15 @@ import { clearActiveCart } from '../redux/slices/cartsSlice';
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 
 export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal, onClose }) => {
+  const user = useSelector(state => state.users.user);
   const [showPartialAmount, setShowPartialAmount] = useState(false);
-  const [customerName, setCustomerName] = useState('');
+  const [customerName, setCustomerName] = useState(user?.name || '');
   const [paymentMethod, setPaymentMethod] = useState('');
   const [partialPaymentAmount, setPartialPaymentAmount] = useState(0);
   const toast = useToast();
   const dispatch = useDispatch();
+  // console.log('user', user);
+  
 
   const handlePurchase = async (e) => {
     e.preventDefault();
@@ -40,7 +43,9 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
         total: calculateCartTotal(),
         paymentMethod: paymentMethod,
         partialPaymentAmount: partialPaymentAmount,
-        status: partialPaymentAmount > 0 ? 'partial' : 'paid',
+        paymentStatus: partialPaymentAmount > 0 ? 'partial' : 'paid',
+        status: user?.isAdmin ? 'approved' : 'pending',
+        ownerId: user?._id,
         createdAt: new Date(),
       };
     
@@ -59,11 +64,10 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
       const data = await response.json();
       console.log('Purchase created:', data);
       
-      // Update stock quantities
-      await updateProductStock(activeCart.products);
-      //clear cart  
+      if (user?.isAdmin) {
+        await updateProductStock(activeCart.products);
+      }
       dispatch(clearActiveCart());
-      //clear cart in local storage
       localStorage.removeItem('cartState');
       //set all modals to close
       handleBackToCart();

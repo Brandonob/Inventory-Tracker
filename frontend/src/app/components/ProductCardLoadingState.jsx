@@ -1,7 +1,7 @@
 import React from 'react';
 import { Box, Skeleton, VStack } from '@chakra-ui/react';
 
-export const LoadingScreen = () => {
+export const ProductCardLoadingState = () => {
   return (
     <Box
       display="flex"

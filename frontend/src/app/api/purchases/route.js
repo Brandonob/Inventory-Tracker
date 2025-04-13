@@ -11,9 +11,9 @@ export async function POST(req) {
     return NextResponse.json({ error: 'No body provided' }, { status: 400 });
   }
 
-  const { customerName, cartId, products, total, paymentMethod, partialPaymentAmount, status } = body;
+  const { customerName, cartId, products, total, paymentMethod, partialPaymentAmount, status, paymentStatus } = body;
 
-  if (!products || !total || !paymentMethod || !status) {
+  if (!products || !total || !paymentMethod || !status || !paymentStatus) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
   } 
 
@@ -25,6 +25,7 @@ export async function POST(req) {
     paymentMethod: paymentMethod,
     partialPaymentAmount: partialPaymentAmount,
     status: status,
+    paymentStatus: paymentStatus,
     createdAt: new Date(),
   };
 

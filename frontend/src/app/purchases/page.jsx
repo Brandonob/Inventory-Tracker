@@ -31,8 +31,15 @@ import Link from 'next/link';
 export default function Purchases() {
   const dispatch = useDispatch();
   const { purchases, loading, error } = useSelector((state) => state.purchases);
+  const user = useSelector(state => state.users.user);
+  
+  
+  
   const [timeFilter, setTimeFilter] = useState('all');
-  const [filteredPurchases, setFilteredPurchases] = useState([]);
+  const [filteredPurchases, setFilteredPurchases] = useState({
+    pendingPurchases: [],
+    approvedPurchases: []
+  });
 
   useEffect(() => {
     dispatch(fetchAllPurchases());
@@ -55,8 +62,39 @@ export default function Purchases() {
           return true;
       }
     });
-    setFilteredPurchases(filtered);
+
+    // Separate purchases into pending and approved
+    setFilteredPurchases({
+      pendingPurchases: filtered.filter(p => p.status === 'pending'),
+      approvedPurchases: filtered.filter(p => p.status !== 'pending')
+    });
   }, [purchases, timeFilter]);
+
+  const handleApprove = async (purchaseId) => {
+    try {
+      const response = await fetch(`/api/purchases/${purchaseId}/approve`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        dispatch(fetchAllPurchases());
+      }
+    } catch (error) {
+      console.error('Error approving purchase:', error);
+    }
+  };
+
+  const handleDecline = async (purchaseId) => {
+    try {
+      const response = await fetch(`/api/purchases/${purchaseId}/decline`, {
+        method: 'POST',
+      });
+      if (response.ok) {
+        dispatch(fetchAllPurchases());
+      }
+    } catch (error) {
+      console.error('Error declining purchase:', error);
+    }
+  };
 
   const formatDate = (dateString) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -122,11 +160,94 @@ export default function Purchases() {
       </Button>
     </ButtonGroup>
 
-    {filteredPurchases.length === 0 ? (
-      <Text color={'white'}>No purchase history available</Text>
-    ) : (
+    {user.isAdmin && filteredPurchases.pendingPurchases.length > 0 && (
+      <>
+        <Heading color={'white'} mb={6}>Pending Approvals</Heading>
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          {filteredPurchases.pendingPurchases.map((purchase) => (
+            <Card key={purchase._id} boxShadow="md">
+              <CardHeader display="flex" justifyContent="space-between">
+                <div className=''>
+                  <Heading size="md">
+                    Order: {purchase.customerName}
+                    {/* #{purchase._id.slice(-6)} */}
+                  </Heading>
+                  <Text color="gray.500" fontSize="sm">
+                    {formatDate(purchase.createdAt)}
+                  </Text>
+                </div>
+                <div className='flex justify-center items-center gap-2'>
+                  {/* <Badge colorScheme={
+                    purchase.status === 'pending' ? 'red' :
+                    purchase.status === 'approved' ? 'green' :
+                    'gray'
+                  }>
+                    {purchase.status}
+                  </Badge> */}
+                  {/* {purchase.status === 'pending' && (
+                    <Badge colorScheme='red'>Pending</Badge>
+                  )}
+                  {purchase.status === 'partial' && (
+                    <Badge colorScheme='yellow'>Partial</Badge>
+                  ) }
+                  {purchase.status === 'paid' && (
+                    <Badge colorScheme='green'>Paid</Badge>
+                  )} */}
+                </div>
+              </CardHeader>
+              <CardBody>
+                <Accordion allowMultiple>
+                  <AccordionItem border="none">
+                    <AccordionButton>
+                      <Box flex="1" textAlign="left">
+                        <Text fontWeight="bold">
+                          {purchase.products.length} items
+                        </Text>
+                      </Box>
+                      <AccordionIcon />
+                    </AccordionButton>
+                    <AccordionPanel>
+                        <VStack align="stretch" spacing={3}>
+                          {purchase.products.map((item, index) => (
+                            <HStack key={index} justify="space-between">
+                              <VStack align="start" spacing={0}>
+                                <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
+                                <Text fontSize="xs" color="gray.500">
+                                  Qty: {item.quantity}
+                                </Text>
+                              </VStack>
+                              <Text fontSize="sm">
+                                ${(item.product.price * item.quantity).toFixed(2)}
+                              </Text>
+                            </HStack>
+                          ))}
+                        </VStack>
+                      </AccordionPanel>
+                    </AccordionItem>
+                  </Accordion>
+                </CardBody>
+                <Divider />
+                <CardFooter>
+                  <ButtonGroup spacing={2}>
+                    <Button colorScheme="green" onClick={() => handleApprove(purchase._id)}>
+                      Approve
+                    </Button>
+                    <Button colorScheme="red" onClick={() => handleDecline(purchase._id)}>
+                      Decline
+                    </Button>
+                  </ButtonGroup>
+                </CardFooter>
+              </Card>
+            ))}
+          </SimpleGrid>
+        </>
+      )}
+
+      <Heading color={'white'} mb={6}>
+        {user.isAdmin ? 'All Approved Purchases' : 'Your Purchases'}
+      </Heading>
       <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-        {filteredPurchases.map((purchase) => (
+        {filteredPurchases.approvedPurchases.map((purchase) => (
           <Card key={purchase._id} boxShadow="md">
             <CardHeader display="flex" justifyContent="space-between">
               <div className=''>
@@ -138,17 +259,21 @@ export default function Purchases() {
                   {formatDate(purchase.createdAt)}
                 </Text>
               </div>
-              <div className='flex justify-center items-center h-[40px] w-[70px]'>
-                {purchase.status === 'pending' && (
-                  <Badge colorScheme='red'>Pending</Badge>
-                )}
-                {purchase.status === 'partial' && (
-                  <Badge colorScheme='yellow'>Partial</Badge>
-                ) }
-                {purchase.status === 'paid' && (
-                  <Badge colorScheme='green'>Paid</Badge>
-                )}
-
+              <div className='flex justify-center items-center gap-2'>
+                {/* <Badge colorScheme={
+                  purchase.status === 'pending' ? 'red' :
+                  purchase.status === 'approved' ? 'green' :
+                  'gray'
+                }>
+                  {purchase.status}
+                </Badge> */}
+                <Badge colorScheme={
+                  purchase.paymentStatus === 'partial' ? 'yellow' :
+                  purchase.paymentStatus === 'paid' ? 'green' :
+                  'gray'
+                }>
+                  {purchase.paymentStatus}
+                </Badge>
               </div>
             </CardHeader>
             <CardBody>
@@ -194,7 +319,6 @@ export default function Purchases() {
             </Card>
           ))}
         </SimpleGrid>
-      )}
         <Box display="flex" justifyContent="center" mb={4}>
           <Link href="/">
             <Image src={hbaby} alt='logo' width={300} height={300} />

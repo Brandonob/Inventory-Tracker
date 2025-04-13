@@ -57,7 +57,7 @@ export default function SignUp() {
       if (response.ok) {
         const data = await response.json();
         console.log('user signed up!', data);
-        dispatch(setUser([data]));
+        dispatch(setUser(data));
         localStorage.setItem('user', JSON.stringify(data));
         toast({
           title: 'Account created.',

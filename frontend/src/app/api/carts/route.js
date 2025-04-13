@@ -11,7 +11,7 @@ export async function POST(req) {
     const newCartData = {
       cartName,
       products: activeCartData,
-      purchaseStatus: 'pending',
+      paymentStatus: 'pending',
       isActiveCart: false,
       createdAt: new Date(),
     };

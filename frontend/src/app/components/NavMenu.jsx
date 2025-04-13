@@ -15,7 +15,8 @@ import { useDispatch } from 'react-redux';
 import { clearUser } from '../redux/slices/usersSlice';
 
 export const NavMenu = () => {
-  const user = useSelector((state) => state.users.user.length > 0);
+  const user = useSelector((state) => state.users.user);
+  const isLoggedIn = !!user; // Check if user exists
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -49,8 +50,7 @@ export const NavMenu = () => {
             <ImMenu3 className='text-white text-4xl h-6 w-6 transition-colors' />
           </MenuButton>
           <MenuList>
-
-            {user && (
+            {isLoggedIn ? (
               <>
                 <MenuItem
                   as='a'
@@ -70,8 +70,7 @@ export const NavMenu = () => {
                   Logout
                 </MenuItem>
               </>
-            )}
-            {!user && (
+            ) : (
               <MenuItem
                 as='a'
                 href='http://localhost:3000/login'

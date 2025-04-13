@@ -16,7 +16,7 @@ import Link from 'next/link';
 import { setActiveCartName, setActiveCartId, addProductToActiveCart, getAllCarts } from './redux/slices/cartsSlice';
 import { NewCartButton } from './components/NewCartButton';
 import Tilt from 'react-parallax-tilt';
-import { LoadingScreen } from './components/ProductCardLoadingState';
+import { ProductCardLoadingState } from './components/ProductCardLoadingState';
 
 export default function Home() {
   const { allProducts, loading, error } = useSelector(
@@ -26,10 +26,11 @@ export default function Home() {
   const activeCart = useSelector((state) => state.carts.activeCart);
   const activeCartProducts = activeCart?.products || [];
   const activeCartId = useSelector((state) => state.carts.activeCartId);
-  const user = useSelector((state) => state.users.user.length > 0);
+  const user = useSelector((state) => state.users.user);
+  const isLoggedIn = !!user;
   const dispatch = useDispatch();
 
-  console.log('USER', useSelector((state) => state.users.user));
+  console.log('USER', user);
   
 
   // Add memoized function to find active cart
@@ -71,13 +72,13 @@ export default function Home() {
             <h1 className='text-4xl font-bold text-white'>In Stock</h1>
           </div>
           <div className='flex items-center'>
-            {user && <AddProductsModal />}
+            {isLoggedIn && <AddProductsModal />}
             <NewCartButton />
           </div>
           {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
           <div className='bg-white rounded-3xl mt-12'>
             {loading ? (
-              <LoadingScreen />
+              <ProductCardLoadingState />
             ) : (
               <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
                 shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
