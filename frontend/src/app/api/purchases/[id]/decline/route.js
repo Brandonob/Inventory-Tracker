@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getDB } from '../../../../../../lib/db';
+import { ObjectId } from 'mongodb';
 
 export async function POST(req, { params }) {
   try {
@@ -7,7 +8,7 @@ export async function POST(req, { params }) {
     const { id } = params;
 
     await db.collection('purchases').updateOne(
-      { _id: id },
+      { _id: new ObjectId(id) },
       { $set: { status: 'declined' } }
     );
 

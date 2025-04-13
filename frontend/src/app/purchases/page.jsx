@@ -43,7 +43,8 @@ export default function Purchases() {
   const [timeFilter, setTimeFilter] = useState('all');
   const [filteredPurchases, setFilteredPurchases] = useState({
     pendingPurchases: [],
-    approvedPurchases: []
+    approvedPurchases: [],
+    completedPurchases: []
   });
 
   useEffect(() => {
@@ -54,12 +55,10 @@ export default function Purchases() {
     if (!purchases) return;
     
     const now = new Date();
-    // Filter purchases based on user role and ownership
     const userAccessFilter = user?.isAdmin 
-      ? purchases // Admin sees all purchases
-      : purchases.filter(purchase => purchase.ownerId === user?._id); // Non-admin sees only their purchases
+      ? purchases
+      : purchases.filter(purchase => purchase.ownerId === user?._id);
 
-    // Then filter by time
     const filtered = userAccessFilter.filter(purchase => {
       const purchaseDate = new Date(purchase.createdAt);
       switch (timeFilter) {
@@ -74,10 +73,10 @@ export default function Purchases() {
       }
     });
 
-    // Separate purchases into pending and approved
     setFilteredPurchases({
       pendingPurchases: filtered.filter(p => p.status === 'pending'),
-      approvedPurchases: filtered.filter(p => p.status !== 'pending')
+      approvedPurchases: filtered.filter(p => p.status === 'approved'),
+      completedPurchases: filtered.filter(p => p.status === 'complete' || p.status === 'declined')
     });
   }, [purchases, timeFilter, user]);
 
@@ -148,6 +147,62 @@ export default function Purchases() {
     }
   };
 
+  const handleComplete = async (purchase) => {
+    debugger;
+    try {
+      if (purchase.paymentStatus === 'partial') {
+        const isConfirmed = window.confirm(
+          'This purchase was partially paid. Has the remaining balance been paid in full?'
+        );
+        
+        if (!isConfirmed) {
+          toast({
+            title: 'Action Cancelled',
+            description: 'Purchase was not marked as complete',
+            status: 'info',
+            duration: 3000,
+            isClosable: true,
+          });
+          return;
+        }
+      }
+
+      const response = await fetch(`/api/purchases/${purchase._id}/complete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          paymentStatus: 'paid',
+          status: 'complete',
+          completedAt: new Date().toISOString()
+        }),
+      });
+
+      if (response.ok) {
+        dispatch(fetchAllPurchases());
+        toast({
+          title: 'Purchase Completed',
+          description: 'Purchase has been marked as complete',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error('Failed to complete purchase');
+      }
+    } catch (error) {
+      console.error('Error completing purchase:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to complete purchase. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
   const updateProductStock = async (products) => {
     try {
       const stockUpdates = products.map(product => ({
@@ -180,12 +235,6 @@ export default function Purchases() {
       hour: '2-digit',
       minute: '2-digit',
     });
-  };
-
-  const calculateTotal = (products) => {
-    return products.reduce((sum, item) => 
-      sum + (parseFloat(item.productPrice) * item.quantity), 0
-    ).toFixed(2);
   };
 
   if (loading) {
@@ -323,82 +372,171 @@ export default function Purchases() {
         </>
       )}
 
-      <Heading color={'white'} mb={6}>
-        {user?.isAdmin ? 'All Approved Purchases' : 'My Approved Purchases'}
-      </Heading>
-      <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-        {filteredPurchases.approvedPurchases.map((purchase) => (
-          <Card key={purchase._id} boxShadow="md">
-            <CardHeader display="flex" justifyContent="space-between">
-              <div className=''>
-                <Heading size="md">
-                  Order: {purchase.customerName}
-                  {/* #{purchase._id.slice(-6)} */}
-                </Heading>
-                <Text color="gray.500" fontSize="sm">
-                  {formatDate(purchase.createdAt)}
-                </Text>
-              </div>
-              <div className='flex justify-center items-center gap-2'>
-                {/* <Badge colorScheme={
-                  purchase.status === 'pending' ? 'red' :
-                  purchase.status === 'approved' ? 'green' :
-                  'gray'
-                }>
-                  {purchase.status}
-                </Badge> */}
-                <Badge colorScheme={
-                  purchase.paymentStatus === 'partial' ? 'yellow' :
-                  purchase.paymentStatus === 'paid' ? 'green' :
-                  'gray'
-                }>
-                  {purchase.paymentStatus}
-                </Badge>
-              </div>
-            </CardHeader>
-            <CardBody>
-              <Accordion allowMultiple>
-                <AccordionItem border="none">
-                  <AccordionButton>
-                    <Box flex="1" textAlign="left">
-                      <Text fontWeight="bold">
-                        {purchase.products.length} items
-                      </Text>
-                    </Box>
-                    <AccordionIcon />
-                  </AccordionButton>
-                  <AccordionPanel>
-                      <VStack align="stretch" spacing={3}>
-                        {purchase.products.map((item, index) => (
-                          <HStack key={index} justify="space-between">
-                            <VStack align="start" spacing={0}>
-                              <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
-                              <Text fontSize="xs" color="gray.500">
-                                Qty: {item.quantity}
-                              </Text>
-                            </VStack>
-                            <Text fontSize="sm">
-                              ${(item.product.price * item.quantity).toFixed(2)}
-                            </Text>
-                          </HStack>
-                        ))}
-                      </VStack>
-                    </AccordionPanel>
-                  </AccordionItem>
-                </Accordion>
-              </CardBody>
-              <Divider />
-              <CardFooter>
-                <HStack justify="space-between" width="100%">
-                  <Text>Total:</Text>
-                  <Text fontWeight="bold">
-                    ${purchase.total}
-                  </Text>
-                </HStack>
-              </CardFooter>
-            </Card>
-          ))}
-        </SimpleGrid>
+      {filteredPurchases.approvedPurchases.length > 0 && (
+        <>
+          <Heading color={'white'} mb={6}>
+            {user?.isAdmin ? 'Approved Purchases' : 'My Approved Purchases'}
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {filteredPurchases.approvedPurchases.map((purchase) => (
+              <Card key={purchase._id} boxShadow="md">
+                <CardHeader display="flex" justifyContent="space-between">
+                  <div className=''>
+                    <Heading size="md">
+                      Order: {purchase.customerName}
+                      {/* #{purchase._id.slice(-6)} */}
+                    </Heading>
+                    <Text color="gray.500" fontSize="sm">
+                      {formatDate(purchase.createdAt)}
+                    </Text>
+                  </div>
+                  <div className='flex justify-center items-center gap-2'>
+                    <Badge colorScheme={
+                      purchase.status === 'pending' ? 'red' :
+                      purchase.status === 'approved' ? 'green' :
+                      'red'
+                    }>
+                      {purchase.status}
+                    </Badge>
+                    <Badge colorScheme={
+                      purchase.paymentStatus === 'partial' ? 'yellow' :
+                      purchase.paymentStatus === 'paid' ? 'green' :
+                      'gray'
+                    }>
+                      {purchase.paymentStatus}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <Accordion allowMultiple>
+                    <AccordionItem border="none">
+                      <AccordionButton>
+                        <Box flex="1" textAlign="left">
+                          <Text fontWeight="bold">
+                            {purchase.products.length} items
+                          </Text>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                      <AccordionPanel>
+                          <VStack align="stretch" spacing={3}>
+                            {purchase.products.map((item, index) => (
+                              <HStack key={index} justify="space-between">
+                                <VStack align="start" spacing={0}>
+                                  <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
+                                  <Text fontSize="xs" color="gray.500">
+                                    Qty: {item.quantity}
+                                  </Text>
+                                </VStack>
+                                <Text fontSize="sm">
+                                  ${(item.product.price * item.quantity).toFixed(2)}
+                                </Text>
+                              </HStack>
+                            ))}
+                          </VStack>
+                        </AccordionPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardBody>
+                  <Divider />
+                  <CardFooter>
+                    <HStack justify="space-between" width="100%">
+                      <Text>Total: ${purchase.total}</Text>
+                      {user?.isAdmin && (
+                        <Button
+                          colorScheme="green"
+                          onClick={() => handleComplete(purchase)}
+                        >
+                          Mark Complete
+                        </Button>
+                      )}
+                    </HStack>
+                  </CardFooter>
+                </Card>
+              ))}
+            </SimpleGrid>
+          </>
+        )}
+
+      {filteredPurchases.completedPurchases.length > 0 && (
+        <>
+          <Heading color={'white'} mb={6}>
+            {user?.isAdmin ? 'Completed Purchases' : 'My Completed Purchases'}
+          </Heading>
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+            {filteredPurchases.completedPurchases.map((purchase) => (
+              <Card key={purchase._id} boxShadow="md">
+                <CardHeader display="flex" justifyContent="space-between">
+                  <div className=''>
+                    <Heading size="md">
+                      Order: {purchase.customerName}
+                      {/* #{purchase._id.slice(-6)} */}
+                    </Heading>
+                    <Text color="gray.500" fontSize="sm">
+                      {formatDate(purchase.createdAt)}
+                    </Text>
+                  </div>
+                  <div className='flex justify-center items-center gap-2'>
+                    <Badge colorScheme={
+                      purchase.status === 'pending' ? 'red' :
+                      purchase.status === 'approved' ? 'green' :
+                      purchase.status === 'complete' ? 'green': 
+                      'red'
+                    }>
+                      {purchase.status}
+                    </Badge>
+                    <Badge colorScheme={
+                      purchase.paymentStatus === 'partial' ? 'yellow' :
+                      purchase.paymentStatus === 'paid' ? 'green' :
+                      'gray'
+                    }>
+                      {purchase.paymentStatus}
+                    </Badge>
+                  </div>
+                </CardHeader>
+                <CardBody>
+                  <Accordion allowMultiple>
+                    <AccordionItem border="none">
+                      <AccordionButton>
+                        <Box flex="1" textAlign="left">
+                          <Text fontWeight="bold">
+                            {purchase.products.length} items
+                          </Text>
+                        </Box>
+                        <AccordionIcon />
+                      </AccordionButton>
+                      <AccordionPanel>
+                          <VStack align="stretch" spacing={3}>
+                            {purchase.products.map((item, index) => (
+                              <HStack key={index} justify="space-between">
+                                <VStack align="start" spacing={0}>
+                                  <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
+                                  <Text fontSize="xs" color="gray.500">
+                                    Qty: {item.quantity}
+                                  </Text>
+                                </VStack>
+                                <Text fontSize="sm">
+                                  ${(item.product.price * item.quantity).toFixed(2)}
+                                </Text>
+                              </HStack>
+                            ))}
+                          </VStack>
+                        </AccordionPanel>
+                      </AccordionItem>
+                    </Accordion>
+                  </CardBody>
+                  <Divider />
+                  <CardFooter>
+                    <HStack justify="space-between" width="100%">
+                      <Text>Total: ${purchase.total}</Text>
+                    </HStack>
+                  </CardFooter>
+                </Card>
+              ))}
+            </SimpleGrid>
+          </>
+        )}
+
         <CartModal activeCart={activeCart || { products: [] }} />
         <NavMenu />
         <Tilt>
