@@ -20,6 +20,7 @@ import {
   AccordionIcon,
   ButtonGroup,
   Button,
+  useToast,
 } from '@chakra-ui/react';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPurchases } from '../redux/slices/purchaseSlice';
@@ -36,6 +37,7 @@ export default function Purchases() {
   const { purchases, loading, error } = useSelector((state) => state.purchases);
   const user = useSelector(state => state.users.user);
   const activeCart = useSelector((state) => state.carts.activeCart);
+  const toast = useToast();
   
   
   const [timeFilter, setTimeFilter] = useState('all');
@@ -80,28 +82,93 @@ export default function Purchases() {
   }, [purchases, timeFilter, user]);
 
   const handleApprove = async (purchaseId) => {
+    debugger;
     try {
+      const purchase = purchases.find(p => p._id === purchaseId);
+      if (!purchase) return;
+
       const response = await fetch(`/api/purchases/${purchaseId}/approve`, {
         method: 'POST',
       });
+      
       if (response.ok) {
+        // Update product stock after approval
+        await updateProductStock(purchase.products);
         dispatch(fetchAllPurchases());
+        
+        toast({
+          title: 'Purchase Approved',
+          description: 'Purchase has been approved and stock has been updated',
+          status: 'success',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error('Failed to approve purchase');
       }
     } catch (error) {
       console.error('Error approving purchase:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to approve purchase. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
     }
   };
 
   const handleDecline = async (purchaseId) => {
+    debugger;
     try {
       const response = await fetch(`/api/purchases/${purchaseId}/decline`, {
         method: 'POST',
       });
       if (response.ok) {
         dispatch(fetchAllPurchases());
+        toast({
+          title: 'Purchase Declined',
+          description: 'Purchase has been declined successfully',
+          status: 'info',
+          duration: 3000,
+          isClosable: true,
+        });
+      } else {
+        throw new Error('Failed to decline purchase');
       }
     } catch (error) {
       console.error('Error declining purchase:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to decline purchase. Please try again.',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const updateProductStock = async (products) => {
+    try {
+      const stockUpdates = products.map(product => ({
+        productId: product.product._id,
+        quantity: product.quantity
+      }));
+
+      const response = await fetch('/api/products/update-stock', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ products: stockUpdates }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update product stock');
+      }
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      // You might want to add toast notification here
     }
   };
 
@@ -131,9 +198,9 @@ export default function Purchases() {
 
   return(
   <Box 
-  p={5}
-  backgroundColor={'black'}
-  minHeight={'100vh'}
+    p={5}
+    backgroundColor={'black'}
+    minHeight={'100vh'}
   >
     <Box display="flex" justifyContent="center" mb={4}>
       <Link href="/">
