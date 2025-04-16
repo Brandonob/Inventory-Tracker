@@ -1,5 +1,5 @@
 import React from 'react';
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import {
   Button,
   Menu,
@@ -10,12 +10,14 @@ import {
   useToast,
 } from '@chakra-ui/react';
 import { ImMenu3 } from 'react-icons/im';
-import { useDispatch } from 'react-redux';
+import { FaSun, FaMoon } from 'react-icons/fa';
 import { clearUser } from '../redux/slices/usersSlice';
+import { toggleTheme } from '../redux/slices/themeSlice';
 
 export const NavMenu = () => {
   const user = useSelector((state) => state.users.user);
-  const isLoggedIn = !!user; // Check if user exists
+  const darkMode = useSelector((state) => state.theme.darkMode);
+  const isLoggedIn = !!user;
   const dispatch = useDispatch();
   const toast = useToast();
 
@@ -38,22 +40,23 @@ export const NavMenu = () => {
           <MenuButton
             as={Button}
             aria-label='Save Cart'
-            bg='gray.400'
+            bg={darkMode ? 'gray.700' : 'gray.400'}
             rounded='20px'
             display='flex'
             alignItems='center'
             justifyContent='center'
             p={2}
-            _hover={{ '& svg': { color: '#F7B578' } }} // Using Chakra's hover style to target the SVG
+            _hover={{ '& svg': { color: '#F7B578' } }}
           >
             <ImMenu3 className='text-white text-4xl h-6 w-6 transition-colors' />
           </MenuButton>
-          <MenuList>
+          <MenuList className='bg-white dark:bg-gray-800'>
             {isLoggedIn ? (
               <>
                 <MenuItem 
                   as='a' 
                   href='http://localhost:3000/'
+                  className='dark:text-white dark:hover:bg-gray-700'
                 >
                   Home
                 </MenuItem>
@@ -62,19 +65,41 @@ export const NavMenu = () => {
                     as='a'
                     href='http://localhost:3000/carts'
                     value='savedCarts'
+                    className='dark:text-white dark:hover:bg-gray-700'
                   >
                     Carts
                   </MenuItem>
                 )}
-                <MenuItem as='a' href='http://localhost:3000/purchases' value='purchases'>
+                <MenuItem 
+                  as='a' 
+                  href='http://localhost:3000/purchases' 
+                  value='purchases'
+                  className='dark:text-white dark:hover:bg-gray-700'
+                >
                   Purchases
                 </MenuItem>
                 <MenuItem
                   as='button'
                   onClick={handleLogout}
                   value='logout'
+                  className='dark:text-white dark:hover:bg-gray-700'
                 >
                   Logout
+                </MenuItem>
+                <MenuItem
+                  as='button'
+                  onClick={() => dispatch(toggleTheme())}
+                  className='dark:text-white dark:hover:bg-gray-700'
+                >
+                  {darkMode ? (
+                    <div className="flex items-center">
+                      <FaSun className="mr-2" /> Light Mode
+                    </div>
+                  ) : (
+                    <div className="flex items-center">
+                      <FaMoon className="mr-2" /> Dark Mode
+                    </div>
+                  )}
                 </MenuItem>
               </>
             ) : (
@@ -82,6 +107,7 @@ export const NavMenu = () => {
                 as='a'
                 href='http://localhost:3000/login'
                 value='login'
+                className='dark:text-white dark:hover:bg-gray-700'
               >
                 Login
               </MenuItem>
