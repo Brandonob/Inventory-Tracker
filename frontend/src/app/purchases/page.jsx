@@ -31,8 +31,10 @@ import Link from 'next/link';
 import Tilt from 'react-parallax-tilt';
 import { NavMenu } from '../components/NavMenu';
 import { CartModal } from '../components/CartModal';
+import { PurchasesLoadingState } from '../components/LoadingStates/PurchasesLoadingState';
 
 export default function Purchases() {
+  const [pageLoading, setPageLoading] = useState(true);
   const dispatch = useDispatch();
   const { purchases, loading, error } = useSelector((state) => state.purchases);
   const user = useSelector(state => state.users.user);
@@ -79,6 +81,14 @@ export default function Purchases() {
       completedPurchases: filtered.filter(p => p.status === 'complete' || p.status === 'declined')
     });
   }, [purchases, timeFilter, user]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleApprove = async (purchaseId) => {
     debugger;
@@ -249,173 +259,83 @@ export default function Purchases() {
     });
   };
 
-  if (loading) {
-    return (
-      <Box p={5} display="flex" justifyContent="center">
-        <Text color={'white'}>Loading purchase history...</Text>
-      </Box>
-    );
+  if (loading || pageLoading) {
+    return <PurchasesLoadingState />;
   }
 
   return(
-  <Box 
-    p={5}
-    backgroundColor={'black'}
-    minHeight={'100vh'}
-  >
-    <Box display="flex" justifyContent="center" mb={4}>
+  <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
+    <div className='flex items-center justify-center'>
       <Link href="/">
         <Image src={hb} alt='logo' width={300} height={300} />
       </Link>
-    </Box>
+    </div>
     <div className='w-[90%] mx-auto'>
+      <Heading mb={6} className='text-black dark:text-white transition-colors duration-200'>
+        {user?.isAdmin ? 'Purchase History' : 'My Purchase History'}
+      </Heading>
+      
+      <ButtonGroup spacing={4} mb={6}>
+        <Button
+          colorScheme={timeFilter === '24h' ? 'blue' : 'gray'}
+          onClick={() => setTimeFilter('24h')}
+        >
+          Last 24 Hours
+        </Button>
+        <Button
+          colorScheme={timeFilter === 'week' ? 'blue' : 'gray'}
+          onClick={() => setTimeFilter('week')}
+        >
+          Past Week
+        </Button>
+        <Button
+          colorScheme={timeFilter === 'month' ? 'blue' : 'gray'}
+          onClick={() => setTimeFilter('month')}
+        >
+          Past Month
+        </Button>
+        <Button
+          colorScheme={timeFilter === 'all' ? 'blue' : 'gray'}
+          onClick={() => setTimeFilter('all')}
+        >
+          All Time
+        </Button>
+      </ButtonGroup>
 
-    <Heading color={'white'} mb={6}>
-      {user?.isAdmin ? 'Purchase History' : 'My Purchase History'}
-    </Heading>
-    
-    <ButtonGroup spacing={4} mb={6}>
-      <Button
-        colorScheme={timeFilter === '24h' ? 'blue' : 'gray'}
-        onClick={() => setTimeFilter('24h')}
-      >
-        Last 24 Hours
-      </Button>
-      <Button
-        colorScheme={timeFilter === 'week' ? 'blue' : 'gray'}
-        onClick={() => setTimeFilter('week')}
-      >
-        Past Week
-      </Button>
-      <Button
-        colorScheme={timeFilter === 'month' ? 'blue' : 'gray'}
-        onClick={() => setTimeFilter('month')}
-      >
-        Past Month
-      </Button>
-      <Button
-        colorScheme={timeFilter === 'all' ? 'blue' : 'gray'}
-        onClick={() => setTimeFilter('all')}
-      >
-        All Time
-      </Button>
-    </ButtonGroup>
-
-    {filteredPurchases.pendingPurchases.length > 0 && (
-      <>
-        <Heading color={'white'} mb={6} mt={6}>
-          {user?.isAdmin ? 'Pending Approvals' : 'Pending Purchases'}
-        </Heading>
-        <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-          {filteredPurchases.pendingPurchases.map((purchase) => (
-            <Card key={purchase._id} boxShadow="md">
-              <CardHeader display="flex" justifyContent="space-between">
-                <div>
-                  <Heading size="md">
-                    Order: {purchase.customerName}
-                  </Heading>
-                  <Text color="gray.500" fontSize="sm">
-                    {formatDate(purchase.createdAt)}
-                  </Text>
-                </div>
-                <div className='flex justify-center items-center gap-2'>
-                  <Badge colorScheme='red'>
-                    {purchase.status}
-                  </Badge>
-                  <Badge colorScheme={
-                    purchase.paymentStatus === 'partial' ? 'yellow' : 'green'
-                  }>
-                    {purchase.paymentStatus}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardBody>
-                <Accordion allowMultiple>
-                  <AccordionItem border="none">
-                    <AccordionButton>
-                      <Box flex="1" textAlign="left">
-                        <Text fontWeight="bold">
-                          {purchase.products.length} items
-                        </Text>
-                      </Box>
-                      <AccordionIcon />
-                    </AccordionButton>
-                    <AccordionPanel>
-                        <VStack align="stretch" spacing={3}>
-                          {purchase.products.map((item, index) => (
-                            <HStack key={index} justify="space-between">
-                              <VStack align="start" spacing={0}>
-                                <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
-                                <Text fontSize="xs" color="gray.500">
-                                  Qty: {item.quantity}
-                                </Text>
-                              </VStack>
-                              <Text fontSize="sm">
-                                ${(item.product.price * item.quantity).toFixed(2)}
-                              </Text>
-                            </HStack>
-                          ))}
-                        </VStack>
-                      </AccordionPanel>
-                    </AccordionItem>
-                  </Accordion>
-                </CardBody>
-                <Divider />
-                <CardFooter>
-                  {user?.isAdmin ? (
-                    <ButtonGroup spacing={2}>
-                      <Button colorScheme="green" onClick={() => handleApprove(purchase._id)}>
-                        Approve
-                      </Button>
-                      <Button colorScheme="red" onClick={() => handleDecline(purchase._id)}>
-                        Decline
-                      </Button>
-                    </ButtonGroup>
-                  ) : (
-                    <HStack justify="space-between" width="100%">
-                      <Text>Total:</Text>
-                      <Text fontWeight="bold">
-                        ${purchase.total}
-                      </Text>
-                    </HStack>
-                  )}
-                </CardFooter>
-              </Card>
-            ))}
-          </SimpleGrid>
-        </>
-      )}
-
-      {filteredPurchases.approvedPurchases.length > 0 && (
+      {filteredPurchases.pendingPurchases.length > 0 && (
         <>
-          <Heading color={'white'} mb={6} mt={6}>
-            {user?.isAdmin ? 'Approved Purchases' : 'My Approved Purchases'}
+          <Heading mb={6} mt={6} className='text-black dark:text-white transition-colors duration-200'>
+            {user?.isAdmin ? 'Pending Approvals' : 'Pending Purchases'}
           </Heading>
-          <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {filteredPurchases.approvedPurchases.map((purchase) => (
-              <Card key={purchase._id} boxShadow="md">
-                <CardHeader display="flex" justifyContent="space-between">
-                  <div className=''>
-                    <Heading size="md">
+          <SimpleGrid 
+            className='border-black dark:border-white'
+            border={'1px solid'} 
+            padding={'16px'} 
+            borderRadius={'6px'} 
+            columns={{ base: 1, md: 2, lg: 3 }} 
+            spacing={6}
+          >
+            {filteredPurchases.pendingPurchases.map((purchase) => (
+              <Card 
+                key={purchase._id} 
+                boxShadow="md"
+                className='bg-white dark:bg-gray-800 transition-colors duration-200'
+              >
+                <CardHeader>
+                  <div>
+                    <Heading size="md" className='text-black dark:text-white transition-colors duration-200'>
                       Order: {purchase.customerName}
-                      {/* #{purchase._id.slice(-6)} */}
                     </Heading>
-                    <Text color="gray.500" fontSize="sm">
+                    <Text className='text-gray-500 dark:text-gray-400 transition-colors duration-200'>
                       {formatDate(purchase.createdAt)}
                     </Text>
                   </div>
                   <div className='flex justify-center items-center gap-2'>
-                    <Badge colorScheme={
-                      purchase.status === 'pending' ? 'red' :
-                      purchase.status === 'approved' ? 'green' :
-                      'red'
-                    }>
+                    <Badge colorScheme='red'>
                       {purchase.status}
                     </Badge>
                     <Badge colorScheme={
-                      purchase.paymentStatus === 'partial' ? 'yellow' :
-                      purchase.paymentStatus === 'paid' ? 'green' :
-                      'gray'
+                      purchase.paymentStatus === 'partial' ? 'yellow' : 'green'
                     }>
                       {purchase.paymentStatus}
                     </Badge>
@@ -426,23 +346,23 @@ export default function Purchases() {
                     <AccordionItem border="none">
                       <AccordionButton>
                         <Box flex="1" textAlign="left">
-                          <Text fontWeight="bold">
+                          <Text fontWeight="bold" className='text-black dark:text-white transition-colors duration-200'>
                             {purchase.products.length} items
                           </Text>
                         </Box>
-                        <AccordionIcon />
+                        <AccordionIcon className='text-black dark:text-white'/>
                       </AccordionButton>
                       <AccordionPanel>
                           <VStack align="stretch" spacing={3}>
                             {purchase.products.map((item, index) => (
                               <HStack key={index} justify="space-between">
                                 <VStack align="start" spacing={0}>
-                                  <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
-                                  <Text fontSize="xs" color="gray.500">
+                                  <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>{`${item.product.name} - ${item.product.description}`}</Text>
+                                  <Text fontSize="xs" className='text-black dark:text-white transition-colors duration-200'>
                                     Qty: {item.quantity}
                                   </Text>
                                 </VStack>
-                                <Text fontSize="sm">
+                                <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>
                                   ${(item.product.price * item.quantity).toFixed(2)}
                                 </Text>
                               </HStack>
@@ -454,17 +374,23 @@ export default function Purchases() {
                   </CardBody>
                   <Divider />
                   <CardFooter>
-                    <HStack justify="space-between" width="100%">
-                      <Text>Total: ${purchase.total}</Text>
-                      {user?.isAdmin && (
-                        <Button
-                          colorScheme="green"
-                          onClick={() => handleComplete(purchase)}
-                        >
-                          Mark Complete
+                    {user?.isAdmin ? (
+                      <ButtonGroup spacing={2}>
+                        <Button colorScheme="green" onClick={() => handleApprove(purchase._id)}>
+                          Approve
                         </Button>
-                      )}
-                    </HStack>
+                        <Button colorScheme="red" onClick={() => handleDecline(purchase._id)}>
+                          Decline
+                        </Button>
+                      </ButtonGroup>
+                    ) : (
+                      <HStack justify="space-between" width="100%">
+                        <Text className='text-black dark:text-white transition-colors duration-200'>Total:</Text>
+                        <Text fontWeight="bold" className='text-black dark:text-white transition-colors duration-200'>
+                          ${purchase.total}
+                        </Text>
+                      </HStack>
+                    )}
                   </CardFooter>
                 </Card>
               ))}
@@ -472,84 +398,190 @@ export default function Purchases() {
           </>
         )}
 
-      {filteredPurchases.completedPurchases.length > 0 && (
-        <>
-          <Heading color={'white'} mb={6} mt={6}>
-            {user?.isAdmin ? 'Completed Purchases' : 'My Completed Purchases'}
-          </Heading>
-          <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
-            {filteredPurchases.completedPurchases.map((purchase) => (
-              <Card key={purchase._id} boxShadow="md">
-                <CardHeader display="flex" justifyContent="space-between">
-                  <div className=''>
-                    <Heading size="md">
-                      Order: {purchase.customerName}
-                      {/* #{purchase._id.slice(-6)} */}
-                    </Heading>
-                    <Text color="gray.500" fontSize="sm">
-                      {formatDate(purchase.createdAt)}
-                    </Text>
-                  </div>
-                  <div className='flex justify-center items-center gap-2'>
-                    <Badge colorScheme={
-                      purchase.status === 'pending' ? 'red' :
-                      purchase.status === 'approved' ? 'green' :
-                      purchase.status === 'complete' ? 'green': 
-                      'red'
-                    }>
-                      {purchase.status}
-                    </Badge>
-                    <Badge colorScheme={
-                      purchase.paymentStatus === 'partial' ? 'yellow' :
-                      purchase.paymentStatus === 'paid' ? 'green' :
-                      'gray'
-                    }>
-                      {purchase.paymentStatus}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardBody>
-                  <Accordion allowMultiple>
-                    <AccordionItem border="none">
-                      <AccordionButton>
-                        <Box flex="1" textAlign="left">
-                          <Text fontWeight="bold">
-                            {purchase.products.length} items
-                          </Text>
-                        </Box>
-                        <AccordionIcon />
-                      </AccordionButton>
-                      <AccordionPanel>
-                          <VStack align="stretch" spacing={3}>
-                            {purchase.products.map((item, index) => (
-                              <HStack key={index} justify="space-between">
-                                <VStack align="start" spacing={0}>
-                                  <Text fontSize="sm">{`${item.product.name} - ${item.product.description}`}</Text>
-                                  <Text fontSize="xs" color="gray.500">
-                                    Qty: {item.quantity}
+        {filteredPurchases.approvedPurchases.length > 0 && (
+          <>
+            <Heading mb={6} mt={6} className='text-black dark:text-white transition-colors duration-200'>
+              {user?.isAdmin ? 'Approved Purchases' : 'My Approved Purchases'}
+            </Heading>
+            <SimpleGrid 
+              className='border-black dark:border-white'
+              border={'1px solid'}
+              padding={'16px'} 
+              borderRadius={'6px'} 
+              columns={{ base: 1, md: 2, lg: 3 }} 
+              spacing={6}
+            >
+              {filteredPurchases.approvedPurchases.map((purchase) => (
+                <Card 
+                  key={purchase._id} 
+                  boxShadow="md"
+                  className='bg-white dark:bg-gray-800 transition-colors duration-200'
+                >
+                  <CardHeader>
+                    <div className=''>
+                      <Heading size="md" className='text-black dark:text-white transition-colors duration-200'>
+                        Order: {purchase.customerName}
+                      </Heading>
+                      <Text className='text-gray-500 dark:text-gray-400 transition-colors duration-200'>
+                        {formatDate(purchase.createdAt)}
+                      </Text>
+                    </div>
+                    <div className='flex justify-center items-center gap-2'>
+                      <Badge colorScheme={
+                        purchase.status === 'pending' ? 'red' :
+                        purchase.status === 'approved' ? 'green' :
+                        'red'
+                      }>
+                        {purchase.status}
+                      </Badge>
+                      <Badge colorScheme={
+                        purchase.paymentStatus === 'partial' ? 'yellow' :
+                        purchase.paymentStatus === 'paid' ? 'green' :
+                        'gray'
+                      }>
+                        {purchase.paymentStatus}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <Accordion allowMultiple>
+                      <AccordionItem border="none">
+                        <AccordionButton>
+                          <Box flex="1" textAlign="left">
+                            <Text fontWeight="bold" className='text-black dark:text-white transition-colors duration-200'>
+                              {purchase.products.length} items
+                            </Text>
+                          </Box>
+                          <AccordionIcon className='text-black dark:text-white'/>
+                        </AccordionButton>
+                        <AccordionPanel>
+                            <VStack align="stretch" spacing={3}>
+                              {purchase.products.map((item, index) => (
+                                <HStack key={index} justify="space-between">
+                                  <VStack align="start" spacing={0}>
+                                    <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>{`${item.product.name} - ${item.product.description}`}</Text>
+                                    <Text fontSize="xs" className='text-black dark:text-white transition-colors duration-200'>
+                                      Qty: {item.quantity}
+                                    </Text>
+                                  </VStack>
+                                  <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>
+                                    ${(item.product.price * item.quantity).toFixed(2)}
                                   </Text>
-                                </VStack>
-                                <Text fontSize="sm">
-                                  ${(item.product.price * item.quantity).toFixed(2)}
-                                </Text>
-                              </HStack>
-                            ))}
-                          </VStack>
-                        </AccordionPanel>
-                      </AccordionItem>
-                    </Accordion>
-                  </CardBody>
-                  <Divider />
-                  <CardFooter>
-                    <HStack justify="space-between" width="100%">
-                      <Text>Total: ${purchase.total}</Text>
-                    </HStack>
-                  </CardFooter>
-                </Card>
-              ))}
-            </SimpleGrid>
-          </>
-        )}
+                                </HStack>
+                              ))}
+                            </VStack>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter>
+                      <HStack justify="space-between" width="100%">
+                        <Text className='text-black dark:text-white transition-colors duration-200'>Total: ${purchase.total}</Text>
+                        {user?.isAdmin && (
+                          <Button
+                            colorScheme="green"
+                            onClick={() => handleComplete(purchase)}
+                          >
+                            Mark Complete
+                          </Button>
+                        )}
+                      </HStack>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </>
+          )}
+
+        {filteredPurchases.completedPurchases.length > 0 && (
+          <>
+            <Heading mb={6} mt={6} className='text-black dark:text-white transition-colors duration-200'>
+              {user?.isAdmin ? 'Completed Purchases' : 'My Completed Purchases'}
+            </Heading>
+            <SimpleGrid 
+              className='border-black dark:border-white'
+              border={'1px solid'}
+              padding={'16px'} 
+              borderRadius={'6px'} 
+              columns={{ base: 1, md: 2, lg: 3 }} 
+              spacing={6}
+            >
+              {filteredPurchases.completedPurchases.map((purchase) => (
+                <Card 
+                  key={purchase._id} 
+                  boxShadow="md"
+                  className='bg-white dark:bg-gray-800 transition-colors duration-200'
+                >
+                  <CardHeader>
+                    <div className=''>
+                      <Heading size="md" className='text-black dark:text-white transition-colors duration-200'>
+                        Order: {purchase.customerName}
+                      </Heading>
+                      <Text className='text-gray-500 dark:text-gray-400 transition-colors duration-200'>
+                        {formatDate(purchase.createdAt)}
+                      </Text>
+                    </div>
+                    <div className='flex justify-center items-center gap-2'>
+                      <Badge colorScheme={
+                        purchase.status === 'pending' ? 'red' :
+                        purchase.status === 'approved' ? 'green' :
+                        purchase.status === 'complete' ? 'green': 
+                        'red'
+                      }>
+                        {purchase.status}
+                      </Badge>
+                      <Badge colorScheme={
+                        purchase.paymentStatus === 'partial' ? 'yellow' :
+                        purchase.paymentStatus === 'paid' ? 'green' :
+                        'gray'
+                      }>
+                        {purchase.paymentStatus}
+                      </Badge>
+                    </div>
+                  </CardHeader>
+                  <CardBody>
+                    <Accordion allowMultiple>
+                      <AccordionItem border="none">
+                        <AccordionButton>
+                          <Box flex="1" textAlign="left">
+                            <Text fontWeight="bold" className='text-black dark:text-white transition-colors duration-200'>
+                              {purchase.products.length} items
+                            </Text>
+                          </Box>
+                          <AccordionIcon className='text-black dark:text-white'/>
+                        </AccordionButton>
+                        <AccordionPanel>
+                            <VStack align="stretch" spacing={3}>
+                              {purchase.products.map((item, index) => (
+                                <HStack key={index} justify="space-between">
+                                  <VStack align="start" spacing={0}>
+                                    <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>{`${item.product.name} - ${item.product.description}`}</Text>
+                                    <Text fontSize="xs" className='text-black dark:text-white transition-colors duration-200'>
+                                      Qty: {item.quantity}
+                                    </Text>
+                                  </VStack>
+                                  <Text fontSize="sm" className='text-black dark:text-white transition-colors duration-200'>
+                                    ${(item.product.price * item.quantity).toFixed(2)}
+                                  </Text>
+                                </HStack>
+                              ))}
+                            </VStack>
+                          </AccordionPanel>
+                        </AccordionItem>
+                      </Accordion>
+                    </CardBody>
+                    <Divider />
+                    <CardFooter>
+                      <HStack justify="space-between" width="100%">
+                        <Text className='text-black dark:text-white transition-colors duration-200'>Total: ${purchase.total}</Text>
+                      </HStack>
+                    </CardFooter>
+                  </Card>
+                ))}
+              </SimpleGrid>
+            </>
+          )}
 
         <CartModal activeCart={activeCart || { products: [] }} />
         <NavMenu />
@@ -561,6 +593,6 @@ export default function Purchases() {
           </Box>
         </Tilt>
     </div>
-    </Box>
+    </div>
   );
 }

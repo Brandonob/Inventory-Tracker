@@ -17,8 +17,10 @@ import { setActiveCartName, setActiveCartId, addProductToActiveCart, getAllCarts
 import { NewCartButton } from './components/NewCartButton';
 import Tilt from 'react-parallax-tilt';
 import { ProductCardLoadingState } from './components/ProductCardLoadingState';
+import { HomeLoadingState } from './components/LoadingStates/HomeLoadingState';
 
 export default function Home() {
+  const [pageLoading, setPageLoading] = useState(true);
   const { allProducts, loading, error } = useSelector(
     (state) => state.products
   );
@@ -39,6 +41,14 @@ export default function Home() {
   }, [allCarts]);
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 2000); // Show loading state for 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  useEffect(() => {
     dispatch(getAllCarts());
     dispatch(fetchAllProducts());
     // If there's an active cart, set it in the Redux state
@@ -57,11 +67,14 @@ export default function Home() {
   const productsInStock = allProducts.filter((product) => product.quantity > 0);
   console.log('PRODUCTS IN STOCK', productsInStock);
 
-  // const getAllProductsInStock
+  if (pageLoading || loading) {
+    return <HomeLoadingState />;
+  }
+
   return (
     <>
       <InitializeDB />
-      <div className='flex flex-col items-center justify-center bg-black h-full'>
+      <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
         <div className='flex items-center justify-center'>
           <Link href="/">
             <Image src={hb} alt='logo' width={300} height={300} />
@@ -69,24 +82,20 @@ export default function Home() {
         </div>
         <div className='flex flex-col w-3/4'>
           <div className='flex justify-between items-center'>
-            <h1 className='text-4xl font-bold text-white'>In Stock</h1>
+            <h1 className='text-4xl font-bold text-black dark:text-white transition-colors duration-200'>In Stock</h1>
           </div>
           <div className='flex items-center'>
             {isLoggedIn && <AddProductsModal />}
             <NewCartButton />
           </div>
           {/* <SaveCartButton activeCart={activeCart} cartId={activeCartId} /> */}
-          <div className='bg-white rounded-3xl mt-12'>
-            {loading ? (
-              <ProductCardLoadingState />
-            ) : (
-              <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
-                shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
-                {productsInStock.map((product) => (
-                  <ProductCard key={product._id} product={product} />
-                ))}
-              </div>
-            )}
+          <div className='bg-white dark:bg-gray-800 rounded-3xl mt-12 transition-colors duration-200'>
+            <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
+              shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
+              {productsInStock.map((product) => (
+                <ProductCard key={product._id} product={product} />
+              ))}
+            </div>
           </div>
         </div>
         <CartModal activeCart={activeCart || { products: [] }} />

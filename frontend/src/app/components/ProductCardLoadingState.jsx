@@ -9,7 +9,7 @@ export const ProductCardLoadingState = () => {
       justifyContent="center"
       gap={4}
       p={8}
-      bg="gray.800"
+      className="bg-[rgb(90,103,250)]/80 backdrop-blur-sm"
       borderRadius="3xl"
     >
       {[...Array(6)].map((_, index) => (
@@ -20,7 +20,7 @@ export const ProductCardLoadingState = () => {
           overflow="hidden"
           boxShadow="md"
           p={4}
-          bg="white"
+          className="bg-white dark:bg-gray-800"
           w="80"
           h="365px"
           _hover={{ boxShadow: 'xl', borderColor: 'rgb(90, 103, 250)' }}

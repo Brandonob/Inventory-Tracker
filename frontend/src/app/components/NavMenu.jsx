@@ -33,6 +33,15 @@ export const NavMenu = () => {
     });
   };
 
+  const menuItemStyles = {
+    bg: darkMode ? 'gray.800' : 'white',
+    color: darkMode ? 'white' : 'black',
+    _hover: {
+      bg: darkMode ? 'gray.700' : 'gray.100',
+    },
+    transition: 'all 0.2s',
+  };
+
   return (
     <>
       <div className='fixed top-0 left-0 m-4'>
@@ -50,13 +59,13 @@ export const NavMenu = () => {
           >
             <ImMenu3 className='text-white text-4xl h-6 w-6 transition-colors' />
           </MenuButton>
-          <MenuList className='bg-white dark:bg-gray-800'>
+          <MenuList bg={darkMode ? 'gray.800' : 'white'} borderColor={darkMode ? 'gray.600' : 'gray.200'}>
             {isLoggedIn ? (
               <>
                 <MenuItem 
                   as='a' 
                   href='http://localhost:3000/'
-                  className='dark:text-white dark:hover:bg-gray-700'
+                  {...menuItemStyles}
                 >
                   Home
                 </MenuItem>
@@ -65,7 +74,7 @@ export const NavMenu = () => {
                     as='a'
                     href='http://localhost:3000/carts'
                     value='savedCarts'
-                    className='dark:text-white dark:hover:bg-gray-700'
+                    {...menuItemStyles}
                   >
                     Carts
                   </MenuItem>
@@ -74,7 +83,7 @@ export const NavMenu = () => {
                   as='a' 
                   href='http://localhost:3000/purchases' 
                   value='purchases'
-                  className='dark:text-white dark:hover:bg-gray-700'
+                  {...menuItemStyles}
                 >
                   Purchases
                 </MenuItem>
@@ -82,14 +91,14 @@ export const NavMenu = () => {
                   as='button'
                   onClick={handleLogout}
                   value='logout'
-                  className='dark:text-white dark:hover:bg-gray-700'
+                  {...menuItemStyles}
                 >
                   Logout
                 </MenuItem>
                 <MenuItem
                   as='button'
                   onClick={() => dispatch(toggleTheme())}
-                  className='dark:text-white dark:hover:bg-gray-700'
+                  {...menuItemStyles}
                 >
                   {darkMode ? (
                     <div className="flex items-center">
@@ -107,7 +116,7 @@ export const NavMenu = () => {
                 as='a'
                 href='http://localhost:3000/login'
                 value='login'
-                className='dark:text-white dark:hover:bg-gray-700'
+                {...menuItemStyles}
               >
                 Login
               </MenuItem>

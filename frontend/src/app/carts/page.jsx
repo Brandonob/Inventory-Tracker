@@ -1,5 +1,5 @@
 'use client';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Text,
@@ -31,19 +31,41 @@ import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
 import hb from '../components/media/hb.png';
 import Link from 'next/link';
+import { CartModal } from '../components/CartModal';
+import { NavMenu } from '../components/NavMenu';
+import { CartsLoadingState } from '../components/LoadingStates/CartsLoadingState';
+import Tilt from 'react-parallax-tilt';
+import hbaby from '../components/media/hbaby.png';
 
 export default function Cart() {
+  const [pageLoading, setPageLoading] = useState(true);
   const dispatch = useDispatch();
   const allCarts = useSelector((state) => state.carts.allCarts);
   const activeCart = useSelector((state) => state.carts.activeCart);
   const allProducts = useSelector((state) => state.products.allProducts);
+  const loading = useSelector((state) => state.carts.loading);
   const toast = useToast();
-  //on page load grab all carts from the database
-  //on page load grab all products from the database
+
+  const findActiveCart = React.useMemo(() => {
+    return allCarts.find(cart => cart.isActiveCart === true);
+  }, [allCarts]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setPageLoading(false);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   useEffect(() => {
     dispatch(getAllCarts());
     dispatch(fetchAllProducts());
-  }, []);
+  }, [dispatch]);
+
+  if (pageLoading || loading) {
+    return <CartsLoadingState />;
+  }
 
   const getCartImages = (cart) => {
     return cart.products.map((product) => product.productImg);
@@ -293,27 +315,21 @@ export default function Cart() {
     }
   };
 
-  const findActiveCart = React.useMemo(() => {
-    return allCarts.find(cart => cart.isActiveCart === true);
-  }, [allCarts]);
-
   return (
-    <Box 
-    p={5}
-    backgroundColor={'black'}
-    height={'100vh'}
-    >
-      <Box display="flex" justifyContent="center" mb={4}>
+    <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
+      <div className='flex items-center justify-center'>
         <Link href="/">
           <Image src={hb} alt='logo' width={300} height={300} />
         </Link>
-      </Box>
+      </div>
       <div className='w-[90%] mx-auto'>
-        <Heading mb={4} color={'white'}>Shopping Carts</Heading>
-        <Text mb={4} color={'white'}>Active Cart: {findActiveCart?.cartName || 'No active cart'}</Text>
+        <Heading mb={4} className='text-black dark:text-white transition-colors duration-200'>Shopping Carts</Heading>
+        <Text mb={4} className='text-black dark:text-white transition-colors duration-200'>
+          Active Cart: {findActiveCart?.cartName || 'No active cart'}
+        </Text>
         <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={5}>
           {allCarts.length === 0 ? (
-            <Text color={'white'}>No carts saved!</Text>
+            <Text className='text-black dark:text-white transition-colors duration-200'>No carts saved!</Text>
           ) : (
             allCarts.map((cart, index) => (
               <Card
@@ -321,16 +337,18 @@ export default function Cart() {
                 boxShadow='md'
                 borderRadius='lg'
                 overflow='hidden'
+                className='bg-white dark:bg-gray-800 transition-colors duration-200'
               >
                 <CardBody>
-                  <Heading size='md' mb={2}>
+                  <Heading size='md' mb={2} className='text-black dark:text-white transition-colors duration-200'>
                     {`${cart.cartName || 'Untitled'} Cart`}
                   </Heading>
-                  <Text mb={2}>Items: {cart.products.length}</Text>
+                  <Text mb={2} className='text-black dark:text-white transition-colors duration-200'>
+                    Items: {cart.products.length}
+                  </Text>
                   <Text fontWeight='bold' color='green.500'>
                     Total: ${getCartTotal(cart).toFixed(2) || '0.00'}
                   </Text>
-                  {/* Prompt user to save current cart before setting a new one */} 
                   <Button
                     onClick={() => activeCart.length > 0 ? toast({
                       title: 'Save Cart ',
@@ -346,6 +364,7 @@ export default function Cart() {
                   <Button
                     onClick={() => handleDeleteCart(cart._id)}
                     mt={3}
+                    ml={2}
                     colorScheme='red'
                   >
                     Delete Cart
@@ -356,6 +375,15 @@ export default function Cart() {
           )}
         </SimpleGrid>
       </div>
-    </Box>
+      <CartModal activeCart={activeCart || { products: [] }} />
+      <NavMenu />
+      <Tilt>
+        <Box display="flex" justifyContent="center" mb={4}>
+          <Link href="/">
+            <Image src={hbaby} alt='logo' width={300} height={300} />
+          </Link>
+        </Box>
+      </Tilt>
+    </div>
   );
 }
