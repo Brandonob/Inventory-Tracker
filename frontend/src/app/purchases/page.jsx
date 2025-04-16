@@ -88,6 +88,12 @@ export default function Purchases() {
 
       const response = await fetch(`/api/purchases/${purchaseId}/approve`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          approvedAt: new Date().toISOString()
+        }),
       });
       
       if (response.ok) {
@@ -122,6 +128,12 @@ export default function Purchases() {
     try {
       const response = await fetch(`/api/purchases/${purchaseId}/decline`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          declinedAt: new Date().toISOString()
+        }),
       });
       if (response.ok) {
         dispatch(fetchAllPurchases());
@@ -256,6 +268,8 @@ export default function Purchases() {
         <Image src={hb} alt='logo' width={300} height={300} />
       </Link>
     </Box>
+    <div className='w-[90%] mx-auto'>
+
     <Heading color={'white'} mb={6}>
       {user?.isAdmin ? 'Purchase History' : 'My Purchase History'}
     </Heading>
@@ -289,10 +303,10 @@ export default function Purchases() {
 
     {filteredPurchases.pendingPurchases.length > 0 && (
       <>
-        <Heading color={'white'} mb={6}>
+        <Heading color={'white'} mb={6} mt={6}>
           {user?.isAdmin ? 'Pending Approvals' : 'Pending Purchases'}
         </Heading>
-        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+        <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
           {filteredPurchases.pendingPurchases.map((purchase) => (
             <Card key={purchase._id} boxShadow="md">
               <CardHeader display="flex" justifyContent="space-between">
@@ -374,10 +388,10 @@ export default function Purchases() {
 
       {filteredPurchases.approvedPurchases.length > 0 && (
         <>
-          <Heading color={'white'} mb={6}>
+          <Heading color={'white'} mb={6} mt={6}>
             {user?.isAdmin ? 'Approved Purchases' : 'My Approved Purchases'}
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
             {filteredPurchases.approvedPurchases.map((purchase) => (
               <Card key={purchase._id} boxShadow="md">
                 <CardHeader display="flex" justifyContent="space-between">
@@ -460,10 +474,10 @@ export default function Purchases() {
 
       {filteredPurchases.completedPurchases.length > 0 && (
         <>
-          <Heading color={'white'} mb={6}>
+          <Heading color={'white'} mb={6} mt={6}>
             {user?.isAdmin ? 'Completed Purchases' : 'My Completed Purchases'}
           </Heading>
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
+          <SimpleGrid border={'1px solid white'} padding={'16px'} borderRadius={'6px'} columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
             {filteredPurchases.completedPurchases.map((purchase) => (
               <Card key={purchase._id} boxShadow="md">
                 <CardHeader display="flex" justifyContent="space-between">
@@ -546,6 +560,7 @@ export default function Purchases() {
             </Link>
           </Box>
         </Tilt>
+    </div>
     </Box>
   );
 }

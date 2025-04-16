@@ -131,25 +131,30 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
   };
 
   return (
-    <Box className='bg-white w-full h-full'>
-      <ModalHeader>Complete Purchase</ModalHeader>
-      <ModalCloseButton />
-      <ModalBody>
-        <VStack spacing={4}>
+    <Box className='bg-black w-full h-full'>
+      <ModalHeader fontSize='40px' textColor='white' fontWeight='bold' display='flex' justifyContent='center'>
+        Complete Purchase
+        <ModalCloseButton />
+      </ModalHeader>
+      <div className='ml-[30%] mr-[30%]'>
+        <ModalBody>
+          <VStack spacing={4}>
           {/* Add your purchase form/content here */}
           {/* form inputs for Name, payment method dropdown, partial payment switch */}
           <FormControl isRequired>
-            <FormLabel>Customer Name</FormLabel>
+            <FormLabel textColor='white'>Customer Name</FormLabel>
             <Input
+              textColor='white'
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel>Payment Method</FormLabel>
+            <FormLabel textColor='white'>Payment Method</FormLabel>
             <Select
               placeholder='Select payment method'
+              textColor='white'
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
               >
@@ -160,7 +165,7 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
           </FormControl>
 
           <FormControl display='flex' alignItems='center'>
-            <FormLabel htmlFor='partial-payment' mb='0'>
+            <FormLabel htmlFor='partial-payment' mb='0' textColor='white'>
               Allow Partial Payment
             </FormLabel>
             <Switch
@@ -171,11 +176,12 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
 
           {showPartialAmount && (
             <FormControl>
-              <FormLabel>Partial Payment Amount</FormLabel>
+              <FormLabel textColor='white'>Partial Payment Amount</FormLabel>
               <InputGroup>
                 <InputLeftAddon>$</InputLeftAddon>
                   <Input
                   type='number'
+                  textColor='white'
                   value={partialPaymentAmount}
                   onChange={(e) => setPartialPaymentAmount(e.target.value)}
                 />
@@ -183,15 +189,16 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
             </FormControl>
           )}
 
-          <Heading size='md'>Purchase Details</Heading>
+          <Heading size='md' textColor='white'>Purchase Details</Heading>
         </VStack>
       </ModalBody>
       <ModalFooter>
         <Button colorScheme='gray' mr={3} onClick={handleBackToCart}>
           Back to Cart
         </Button>
-        <Button colorScheme='blue' onClick={handlePurchase}>Confirm Purchase</Button>
-      </ModalFooter>
+          <Button colorScheme='blue' onClick={handlePurchase}>Confirm Purchase</Button>
+        </ModalFooter>
+    </div>
     </Box>
   );
 };

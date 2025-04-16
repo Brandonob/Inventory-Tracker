@@ -109,62 +109,67 @@ export const CartModal = ({ activeCart }) => {
             </Slide>
           ) : (
             <Slide direction='left' in={true} style={{ width: '100%' }}>
-              <Box className='bg-white w-full h-full'>
-                <ModalHeader>
+              <Box className='bg-black w-full h-full' >
+                <ModalHeader fontSize='40px' textColor='white' fontWeight='bold' display='flex' justifyContent='center'>
                   Cart
                   <ModalCloseButton />
                 </ModalHeader>
-                <ModalBody className='max-h-[485px] overflow-y-auto'>
-                  <VStack spacing={4} align='stretch'>
-                    {!activeCart?.products?.length ? (
-                      <Text>Your cart is empty</Text>
-                    ) : (
-                      activeCart.products.map((cartItem) => (
-                        <HStack
-                          key={cartItem.product._id}
-                          p={3}
-                          borderWidth={1}
-                          borderRadius='md'
-                          justifyContent='space-between'
-                        >
-                          {/* <Image
-                            boxSize='50px'
-                            src={cartItem.product.image}
-                            alt={cartItem.product.name}
+                <div className='ml-[20%] mr-[20%]'>
+                  <ModalBody className='max-h-[485px] overflow-y-auto'>
+                    <VStack border={'1px solid white'} padding={'16px'} borderRadius={'6px'} spacing={4} align='stretch'>
+                      {!activeCart?.products?.length ? (
+                        <Text textColor='white'>Your cart is empty</Text>
+                      ) : (
+                        activeCart.products.map((cartItem) => (
+                          <HStack
+                            key={cartItem.product._id}
+                            p={3}
+                            borderWidth={1}
                             borderRadius='md'
-                          /> */}
-                          <Text flex={1}>{cartItem.product.name}</Text>
-                          <Text fontWeight='bold'>
-                            ${cartItem.product.price}
-                          </Text>
-                          <QuantitySelector cartItem={cartItem} />
-                        </HStack>
-                      ))
-                    )}
-                  </VStack>
-                </ModalBody>
+                            justifyContent='space-between'
+                          >
+                            <Image
+                              boxSize='50px'
+                              src={cartItem.product.image}
+                              alt={cartItem.product.name}
+                              borderRadius='md'
+                              border={'1px solid lightgray'}
+                            />
+                            <Text   flex={1} textColor='white'>{`${cartItem.product.name} - ${cartItem.product.description}`}</Text>
+                            {console.log('cartItem', cartItem)}
+                            <Text fontWeight='bold' textColor='white'>
+                              ${cartItem.product.price * cartItem.quantity}
+                            </Text>
+                            <QuantitySelector cartItem={cartItem} />
+                          </HStack>
+                        ))
+                      )}
+                    </VStack>
+                  </ModalBody>
 
-                <ModalFooter>
-                  <Text mr={4} fontWeight="bold">
-                    Total: ${calculateCartTotal().toFixed(2)}
-                  </Text>
-                  {user?.isAdmin && (
-                      <Button
-                        isDisabled={isEmptyCart}
-                        onClick={handleSaveCartClick}
+                  <ModalFooter>
+                    <Text mr={4} fontWeight="bold" textColor='white'>
+                      Total: ${calculateCartTotal().toFixed(2)}
+                    </Text>
+                    {user?.isAdmin && (
+                        <Button
+                          isDisabled={isEmptyCart}
+                          onClick={handleSaveCartClick}
+                      >
+                        Save Cart
+                      </Button>
+                    )}
+                    <Button
+                      isDisabled={isEmptyCart}
+                      colorScheme='blue'
+                      mr={3}
+                      onClick={handlePurchaseClick}
                     >
-                      Save Cart
+                      Purchase
                     </Button>
-                  )}
-                  <Button
-                    isDisabled={isEmptyCart}
-                    colorScheme='blue'
-                    mr={3}
-                    onClick={handlePurchaseClick}
-                  >
-                    Purchase
-                  </Button>
-                </ModalFooter>
+                  </ModalFooter>
+                </div>
+
               </Box>
             </Slide>
           )}

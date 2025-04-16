@@ -6,10 +6,16 @@ export async function POST(req, { params }) {
   try {
     const db = await getDB();
     const { id } = params;
+    const { declinedAt } = await req.json();
 
     await db.collection('purchases').updateOne(
       { _id: new ObjectId(id) },
-      { $set: { status: 'declined' } }
+      { 
+        $set: { 
+          status: 'declined',
+          declinedAt: declinedAt
+        } 
+      }
     );
 
     return NextResponse.json({ message: 'Purchase declined successfully' });

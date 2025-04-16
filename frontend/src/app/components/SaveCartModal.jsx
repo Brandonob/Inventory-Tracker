@@ -58,34 +58,36 @@ export const SaveCartModal = ({ activeCart, handleBackToCart }) => {
   };
 
   return (
-    <Box className='bg-white w-full h-full'>
+    <Box className='bg-black w-full h-full'>
       <form onSubmit={handleSaveCart}>
-        <ModalHeader>
+        <ModalHeader fontSize='40px' textColor='white' fontWeight='bold' display='flex' justifyContent='center'>
           Save Cart
           <ModalCloseButton />
         </ModalHeader>
-        <ModalBody className='max-h-[485px] overflow-y-auto'>
-          <VStack spacing={4} align='stretch'>
-            <FormControl mb={4}>
-              <FormLabel>Name</FormLabel>
-              <Input
-                name='cartName'
-                value={cartName}
-                placeholder='Enter cart name'
-                onChange={(e) => setCartName(e.target.value)}
-              />
-            </FormControl>
-          </VStack>
-        </ModalBody>
+        <div className='ml-[30%] mr-[30%]'>
+          <ModalBody className='max-h-[485px] overflow-y-auto'>
+            <VStack border={'1px solid white'} padding={'16px'} borderRadius={'6px'} spacing={4} align='stretch'>
+              <FormControl mb={4}>
+                <FormLabel textColor='white'>Cart Name</FormLabel>
+                <Input
+                  name='cartName'
+                  value={cartName}
+                  placeholder='Enter cart name'
+                  onChange={(e) => setCartName(e.target.value)}
+                />
+              </FormControl>
+            </VStack>
+          </ModalBody>
 
-        <ModalFooter>
-          <Button colorScheme='gray' mr={3} onClick={handleBackToCart}>
-            Back to Cart
-          </Button>
-          <Button type='submit' colorScheme='blue' mr={3}>
-            Save Cart
-          </Button>
-        </ModalFooter>
+          <ModalFooter>
+            <Button colorScheme='gray' mr={3} onClick={handleBackToCart}>
+              Back to Cart
+            </Button>
+            <Button type='submit' colorScheme='blue' mr={3}>
+              Save Cart
+            </Button>
+          </ModalFooter>
+        </div>
       </form>
     </Box>
   );
