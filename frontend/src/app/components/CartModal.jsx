@@ -36,6 +36,7 @@ export const CartModal = ({ activeCart }) => {
   const [showPurchase, setShowPurchase] = useState(false);
   const [showSaveCart, setShowSaveCart] = useState(false);
   const user = useSelector((state) => state.users.user);
+  const darkMode = useSelector((state) => state.theme.darkMode);
   const isEmptyCart = !activeCart?.products?.length;
   console.log('CART MODAL', activeCart);
 
@@ -68,7 +69,7 @@ export const CartModal = ({ activeCart }) => {
       {/* <Button onClick={onOpen} colorScheme='blue' className='w-28'> */}
       <Button
         onClick={onOpen}
-        bg='gray.400'
+        bg={darkMode ? 'gray.700' : 'gray.400'}
         rounded='20px'
         position='fixed'
         top='0px'
@@ -81,7 +82,7 @@ export const CartModal = ({ activeCart }) => {
       >
         <IoBagCheckOutline
           size={24}
-          className=' text-white transition-colors'
+          className='text-white transition-colors'
         />
       </Button>
       {/* Add Item */}
@@ -90,7 +91,7 @@ export const CartModal = ({ activeCart }) => {
       <Modal size='lg' isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
-        <ModalContent>
+        <ModalContent bg={darkMode ? 'gray.800' : 'white'}>
           {showPurchase ? (
             <Slide direction='right' in={true} style={{ width: '100%' }}>
               <PurchaseModal
@@ -109,10 +110,10 @@ export const CartModal = ({ activeCart }) => {
             </Slide>
           ) : (
             <Slide direction='left' in={true} style={{ width: '100%' }}>
-              <Box className='bg-black w-full h-full' >
-                <ModalHeader fontSize='40px' textColor='white' fontWeight='bold' display='flex' justifyContent='center'>
+              <Box className='bg-white dark:bg-gray-800 w-full h-full transition-colors duration-200'>
+                <ModalHeader className='text-black dark:text-white transition-colors duration-200' fontSize='40px' fontWeight='bold' display='flex' justifyContent='center'>
                   Cart
-                  <ModalCloseButton />
+                  <ModalCloseButton className='text-black dark:text-white' />
                 </ModalHeader>
                 <div className='ml-[20%] mr-[20%]'>
                   <ModalBody className='max-h-[485px] overflow-y-auto'>

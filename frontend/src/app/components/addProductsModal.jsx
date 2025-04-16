@@ -20,6 +20,7 @@ import {
   IconButton,
 } from '@chakra-ui/react';
 import { RiAddCircleFill } from "react-icons/ri";
+import { useSelector } from 'react-redux';
 // import { useDispatch } from 'react-redux';
 // import { addProduct } from '../redux/slices/productsSlice';
 // import { loadComponents } from 'next/dist/server/load-components';
@@ -28,6 +29,7 @@ import { RiAddCircleFill } from "react-icons/ri";
 
 export const AddProductsModal = () => {
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const darkMode = useSelector((state) => state.theme.darkMode);
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [price, setPrice] = useState(0);
@@ -192,67 +194,73 @@ export const AddProductsModal = () => {
 
       <Modal isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
-
-        <ModalContent>
+        <ModalContent className='bg-white dark:bg-gray-800 transition-colors duration-200'>
           <form onSubmit={handleSubmit}>
-            <ModalHeader>Add New Item</ModalHeader>
-            <ModalCloseButton />
+            <ModalHeader className='text-black dark:text-white transition-colors duration-200' fontSize='30px' fontWeight='bold' display='flex' justifyContent='center'>
+              Add New Item
+              <ModalCloseButton className='text-black dark:text-white' />
+            </ModalHeader>
             <ModalBody>
               <FormControl mb={4}>
-                <FormLabel>Name</FormLabel>
+                <FormLabel className='text-black dark:text-white transition-colors duration-200'>Name</FormLabel>
                 <Input
                   name='name'
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className='bg-white dark:bg-gray-700 text-black dark:text-white'
                 />
               </FormControl>
 
               <FormControl mb={4}>
-                <FormLabel>Description</FormLabel>
+                <FormLabel className='text-black dark:text-white transition-colors duration-200'>Description</FormLabel>
                 <Textarea
                   name='description'
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
+                  className='bg-white dark:bg-gray-700 text-black dark:text-white'
                 />
               </FormControl>
 
               <FormControl mb={4}>
-                <FormLabel>Price</FormLabel>
+                <FormLabel className='text-black dark:text-white transition-colors duration-200'>Price</FormLabel>
                 <NumberInput defaultValue={0} min={0}>
                   <NumberInputField
                     name='price'
                     value={price}
                     onChange={(e) => setPrice(e.target.value)}
+                    className='bg-white dark:bg-gray-700 text-black dark:text-white'
                   />
                 </NumberInput>
               </FormControl>
 
               <FormControl mb={4}>
-                <FormLabel>Quantity</FormLabel>
+                <FormLabel className='text-black dark:text-white transition-colors duration-200'>Quantity</FormLabel>
                 <NumberInput defaultValue={0} min={0}>
                   <NumberInputField
                     name='quantity'
                     value={quantity}
                     onChange={(e) => setQuantity(e.target.value)}
+                    className='bg-white dark:bg-gray-700 text-black dark:text-white'
                   />
                 </NumberInput>
               </FormControl>
 
               <FormControl mb={4}>
-                <FormLabel>Image</FormLabel>
+                <FormLabel className='text-black dark:text-white transition-colors duration-200'>Image</FormLabel>
                 <Input
                   type='file'
                   accept='image/*'
                   onChange={(e) => setImage(e.target.files[0])}
+                  className='bg-white dark:bg-gray-700 text-black dark:text-white'
                 />
               </FormControl>
             </ModalBody>
 
             <ModalFooter>
-              <Button colorScheme='blue' mr={3} type='submit'>
+              <Button colorScheme='blue' mr={3} type='submit' className='text-black dark:text-white transition-colors duration-200'>
                 Add Product
               </Button>
-              <Button variant='ghost' onClick={onClose}>
+              <Button variant='ghost' onClick={onClose} className='text-black dark:text-white transition-colors duration-200'>
                 Cancel
               </Button>
             </ModalFooter>

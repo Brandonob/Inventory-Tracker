@@ -23,6 +23,7 @@ import { fetchAllProducts } from '../redux/slices/productsSlice';
 
 export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal, onClose }) => {
   const user = useSelector(state => state.users.user);
+  const darkMode = useSelector((state) => state.theme.darkMode);
   const [showPartialAmount, setShowPartialAmount] = useState(false);
   const [customerName, setCustomerName] = useState(user?.userName || '');
   const [paymentMethod, setPaymentMethod] = useState('');
@@ -131,10 +132,10 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
   };
 
   return (
-    <Box className='bg-black w-full h-full'>
-      <ModalHeader fontSize='40px' textColor='white' fontWeight='bold' display='flex' justifyContent='center'>
+    <Box className='bg-white dark:bg-gray-800 w-full h-full transition-colors duration-200'>
+      <ModalHeader className='text-black dark:text-white transition-colors duration-200' fontSize='40px' fontWeight='bold' display='flex' justifyContent='center'>
         Complete Purchase
-        <ModalCloseButton />
+        <ModalCloseButton className='text-black dark:text-white' />
       </ModalHeader>
       <div className='ml-[30%] mr-[30%]'>
         <ModalBody>
@@ -142,21 +143,22 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
           {/* Add your purchase form/content here */}
           {/* form inputs for Name, payment method dropdown, partial payment switch */}
           <FormControl isRequired>
-            <FormLabel textColor='white'>Customer Name</FormLabel>
+            <FormLabel className='text-black dark:text-white transition-colors duration-200'>Customer Name</FormLabel>
             <Input
-              textColor='white'
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
+              className='bg-white dark:bg-gray-700 text-black dark:text-white'
             />
           </FormControl>
 
           <FormControl isRequired>
-            <FormLabel textColor='white'>Payment Method</FormLabel>
+            <FormLabel className='text-black dark:text-white transition-colors duration-200'>Payment Method</FormLabel>
             <Select
               placeholder='Select payment method'
-              textColor='white'
               value={paymentMethod}
               onChange={(e) => setPaymentMethod(e.target.value)}
+              className='bg-white dark:bg-gray-700 text-black dark:text-white'
+              iconColor={darkMode ? 'white' : 'black'}
               >
               <option value='cash'>Cash</option>
               <option value='zelle'>Zelle</option>
@@ -165,7 +167,7 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
           </FormControl>
 
           <FormControl display='flex' alignItems='center'>
-            <FormLabel htmlFor='partial-payment' mb='0' textColor='white'>
+            <FormLabel htmlFor='partial-payment' mb='0' className='text-black dark:text-white transition-colors duration-200'>
               Allow Partial Payment
             </FormLabel>
             <Switch
@@ -176,20 +178,20 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
 
           {showPartialAmount && (
             <FormControl>
-              <FormLabel textColor='white'>Partial Payment Amount</FormLabel>
+              <FormLabel className='text-black dark:text-white transition-colors duration-200'>Partial Payment Amount</FormLabel>
               <InputGroup>
                 <InputLeftAddon>$</InputLeftAddon>
                   <Input
                   type='number'
-                  textColor='white'
                   value={partialPaymentAmount}
                   onChange={(e) => setPartialPaymentAmount(e.target.value)}
+                  className='bg-white dark:bg-gray-700 text-black dark:text-white'
                 />
               </InputGroup>
             </FormControl>
           )}
 
-          <Heading size='md' textColor='white'>Purchase Details</Heading>
+          <Heading size='md' className='text-black dark:text-white transition-colors duration-200'>Purchase Details</Heading>
         </VStack>
       </ModalBody>
       <ModalFooter>
