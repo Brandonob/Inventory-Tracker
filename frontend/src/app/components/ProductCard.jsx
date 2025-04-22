@@ -26,6 +26,7 @@ import {
 } from '../redux/slices/cartsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import { QuantitySelector } from './QuantitySelector';
+import { motion } from 'framer-motion';
 
 export const ProductCard = ({ product }) => {
   console.log('PRODUCT CARD', product);
@@ -76,18 +77,10 @@ export const ProductCard = ({ product }) => {
     // debugger;
     //Send to RTK and return succes toast
     //if active cart is empty, set the product to the active cart
-    const activeCartLength = activeCart.products.length;
+    const activeCartLength = activeCart?.products?.length || 0;
     // const activeCartId = state.activeCartId;
 
     if (activeCartLength === 0 && activeCartId === null) {
-      //Post new cart to db and get the id
-      //set the id to the active cart id
-      //add the product to the active cart
-      // const newCartId = await createNewCartGetId();
-      // console.log('NEW CART ID', newCartId);
-      //set active cart id in redux
-      // dispatch(setActiveCartId(newCartId));
-      //add the product to the active cart in redux
       dispatch(setActiveCart({ product, quantity: 1 }));
     } else {
       //add the product to the active cart in redux
@@ -129,13 +122,17 @@ export const ProductCard = ({ product }) => {
 
   return (
     <Box
-      borderWidth='1px'
+      as={motion.div}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5 }}
+      borderWidth='2px'
       borderRadius='lg'
       overflow='hidden'
       boxShadow='md'
       p={4}
       bg='white'
-      _hover={{ boxShadow: 'xl' }}
+      _hover={{ boxShadow: 'xl', borderColor: 'rgb(90, 103, 250)' }}
       className='w-80 h-[365px]'
     >
       {console.log('product card!', product)}

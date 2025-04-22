@@ -3,9 +3,9 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import './globals.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import ReduxProvider from './redux/provider';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 // import { checkDatabaseConnection } from './redux/slices/databaseSlice';
-// import { useEffect } from 'react';
-// import { useDispatch } from 'react-redux';
 // import { connectToDB } from '../../lib/db';
 // import { store } from './redux/store';
 const geistSans = Geist({
@@ -24,6 +24,20 @@ const geistMono = Geist_Mono({
 // };
 // connectToDB(store);
 
+function ThemeInitializer() {
+  const darkMode = useSelector((state) => state.theme.darkMode);
+
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
+
+  return null;
+}
+
 export default function RootLayout({ children }) {
   // const dispatch = useDispatch();
 
@@ -34,9 +48,10 @@ export default function RootLayout({ children }) {
   return (
     <html lang='en'>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black transition-colors duration-200`}
       >
         <ReduxProvider>
+          <ThemeInitializer />
           <ChakraProvider>{children}</ChakraProvider>
         </ReduxProvider>
       </body>

@@ -43,7 +43,6 @@ export const fetchAllProducts = () => async (dispatch) => {
     if (response.ok) {
       const data = await response.json();
       console.log('All Products:', data.products);
-      // debugger;
 
       dispatch(setProducts(data.products || []));
     } else {
@@ -51,6 +50,7 @@ export const fetchAllProducts = () => async (dispatch) => {
     }
   } catch (error) {
     console.error('Error fetching products:', error);
+    dispatch(setError(error.message));
   }
 };
 

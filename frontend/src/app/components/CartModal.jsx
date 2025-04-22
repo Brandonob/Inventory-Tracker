@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { IoBagCheckOutline } from 'react-icons/io5';
 import { FaTrash } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { PurchaseModal } from './PurchaseModal';
 import { removeProductFromActiveCart } from '../redux/slices/cartsSlice';
 
@@ -35,10 +35,20 @@ export const CartModal = ({ activeCart }) => {
   const { isOpen, onOpen, onClose } = useDisclosure();
   const [showPurchase, setShowPurchase] = useState(false);
   const [showSaveCart, setShowSaveCart] = useState(false);
-  const isEmptyCart = activeCart.products.length < 1;
+  const user = useSelector((state) => state.users.user);
+  const darkMode = useSelector((state) => state.theme.darkMode);
+  const isEmptyCart = !activeCart?.products?.length;
   console.log('CART MODAL', activeCart);
 
   const dispatch = useDispatch();
+
+  const calculateCartTotal = () => {
+    if (!activeCart?.products?.length) return 0;
+    
+    return activeCart.products.reduce((total, cartItem) => {
+      return total + (cartItem.product.price * cartItem.quantity);
+    }, 0);
+  };
 
   const handlePurchaseClick = () => {
     setShowPurchase(true);
@@ -59,20 +69,20 @@ export const CartModal = ({ activeCart }) => {
       {/* <Button onClick={onOpen} colorScheme='blue' className='w-28'> */}
       <Button
         onClick={onOpen}
-        bg='gray.400'
+        bg={darkMode ? 'gray.700' : 'gray.400'}
         rounded='20px'
         position='fixed'
-        bottom='0px'
+        top='0px'
         right='0px'
         margin='16px'
         height='40px'
         width='40px'
         p={2}
-        _hover={{ '& svg': { color: '#FACC15' } }} // Using Chakra's hover style to target the SVG
+        _hover={{ '& svg': { color: '#F7B578' } }} // Using Chakra's hover style to target the SVG
       >
         <IoBagCheckOutline
           size={24}
-          className=' text-white transition-colors'
+          className='text-white transition-colors'
         />
       </Button>
       {/* Add Item */}
@@ -81,10 +91,15 @@ export const CartModal = ({ activeCart }) => {
       <Modal size='lg' isOpen={isOpen} onClose={onClose}>
         <ModalOverlay />
 
-        <ModalContent>
+        <ModalContent bg={darkMode ? 'gray.800' : 'white'}>
           {showPurchase ? (
             <Slide direction='right' in={true} style={{ width: '100%' }}>
-              <PurchaseModal handleBackToCart={handleBackToCart} />
+              <PurchaseModal
+                handleBackToCart={handleBackToCart}
+                activeCart={activeCart}
+                calculateCartTotal={calculateCartTotal}
+                onClose={onClose}
+               />
             </Slide>
           ) : showSaveCart ? (
             <Slide direction='right' in={true} style={{ width: '100%' }}>
@@ -95,98 +110,72 @@ export const CartModal = ({ activeCart }) => {
             </Slide>
           ) : (
             <Slide direction='left' in={true} style={{ width: '100%' }}>
-              <Box className='bg-white w-full h-full'>
-                <ModalHeader>
+              <Box className='bg-white dark:bg-gray-800 w-full h-full transition-colors duration-200'>
+                <ModalHeader className='text-black dark:text-white transition-colors duration-200' fontSize='40px' fontWeight='bold' display='flex' justifyContent='center'>
                   Cart
-                  <ModalCloseButton />
+                  <ModalCloseButton className='text-black dark:text-white' />
                 </ModalHeader>
-                <ModalBody className='max-h-[485px] overflow-y-auto'>
-                  <VStack spacing={4} align='stretch'>
-                    {activeCart.products.length === 0 ? (
-                      <Text>Your cart is empty</Text>
-                    ) : (
-                      activeCart.products.map((cartItem) => (
-                        <HStack
-                          key={cartItem.product._id}
-                          p={3}
-                          borderWidth={1}
-                          borderRadius='md'
-                          justifyContent='space-between'
-                        >
-                          {/* <Image
-                            boxSize='50px'
-                            src={cartItem.product.image}
-                            alt={cartItem.product.name}
+                <div className='ml-[20%] mr-[20%]'>
+                  <ModalBody className='max-h-[485px] overflow-y-auto'>
+                    <VStack border={'1px solid white'} padding={'16px'} borderRadius={'6px'} spacing={4} align='stretch'>
+                      {!activeCart?.products?.length ? (
+                        <Text textColor='white'>Your cart is empty</Text>
+                      ) : (
+                        activeCart.products.map((cartItem) => (
+                          <HStack
+                            key={cartItem.product._id}
+                            p={3}
+                            borderWidth={1}
                             borderRadius='md'
-                          /> */}
-                          <Text flex={1}>{cartItem.product.name}</Text>
-                          <Text fontWeight='bold'>
-                            ${cartItem.product.price}
-                          </Text>
-                          <QuantitySelector cartItem={cartItem} />
-                        </HStack>
-                      ))
-                    )}
-                  </VStack>
-                </ModalBody>
+                            justifyContent='space-between'
+                          >
+                            <Image
+                              boxSize='50px'
+                              src={cartItem.product.image}
+                              alt={cartItem.product.name}
+                              borderRadius='md'
+                              border={'1px solid lightgray'}
+                            />
+                            <Text   flex={1} textColor='white'>{`${cartItem.product.name} - ${cartItem.product.description}`}</Text>
+                            {console.log('cartItem', cartItem)}
+                            <Text fontWeight='bold' textColor='white'>
+                              ${cartItem.product.price * cartItem.quantity}
+                            </Text>
+                            <QuantitySelector cartItem={cartItem} />
+                          </HStack>
+                        ))
+                      )}
+                    </VStack>
+                  </ModalBody>
 
-                <ModalFooter>
-                  <Button
-                    isDisabled={isEmptyCart}
-                    onClick={handleSaveCartClick}
-                  >
-                    Save Cart
-                  </Button>
-                  <Button
-                    isDisabled={isEmptyCart}
-                    colorScheme='blue'
-                    mr={3}
-                    onClick={handlePurchaseClick}
-                  >
-                    Purchase
-                  </Button>
-                </ModalFooter>
+                  <ModalFooter>
+                    <Text mr={4} fontWeight="bold" textColor='white'>
+                      Total: ${calculateCartTotal().toFixed(2)}
+                    </Text>
+                    {user?.isAdmin && (
+                        <Button
+                          isDisabled={isEmptyCart}
+                          onClick={handleSaveCartClick}
+                      >
+                        Save Cart
+                      </Button>
+                    )}
+                    <Button
+                      isDisabled={isEmptyCart}
+                      colorScheme='blue'
+                      mr={3}
+                      onClick={handlePurchaseClick}
+                    >
+                      Purchase
+                    </Button>
+                  </ModalFooter>
+                </div>
+
               </Box>
             </Slide>
           )}
         </ModalContent>
       </Modal>
-      {/* <div className='fixed bottom-0 right-0 m-4'>
-        <IconButton
-          className='!bg-gray-400 !rounded-[20px] '
-          aria-label='Save Cart'
-        >
-          <IoBagCheckOutline className='hover:text-yellow-400 text-white text-4xl h-[30px] w-[30px] ' />
-        </IconButton>
-      </div> */}
-      {/* <div className='fixed bottom-0 right-0 m-4'>
-        //pop up menu for viewing cart items
-        <Menu>
-          <MenuButton
-            as={IconButton}
-            bg='gray.400'
-            rounded='20px'
-            display='flex'
-            alignItems='center'
-            justifyContent='center'
-            p={2}
-            _hover={{ '& svg': { color: '#FACC15' } }} // Using Chakra's hover style to target the SVG
-          >
-            <IoBagCheckOutline className=' text-white text-4xl h-6 w-6 transition-colors' />
-          </MenuButton>
-          <MenuList>
-            {activeCart.products.length > 0 ? (
-              activeCart.products.map((item) => (
-                <MenuItem key={item.product._id}>
-                  {`${item.product.name} - ${item.product.description} X ${item.quantity}`}
-                </MenuItem>
-              ))
-            ) : (
-              <MenuItem>No items in cart!</MenuItem>
-            )}
-          </MenuList>
-        </Menu>
-      </div> */}
     </>
   );
 };

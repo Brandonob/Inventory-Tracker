@@ -9,39 +9,47 @@ import {
   FormLabel,
   VStack,
   Heading,
+  Text,
 } from '@chakra-ui/react';
 import { useDispatch } from 'react-redux';
 import { setUser } from '../redux/slices/usersSlice';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function Login() {
   const [userName, setUserName] = useState('');
   const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const router = useRouter();
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // debugger;
+    debugger;
 
     const user = { userName, password };
     console.log('Sending login request with:', user);
 
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(user),
-    });
+    try {
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(user),
+      });
 
-    if (response.ok) {
-      const data = await response.json();
-      console.log('user logged in!', data);
-      dispatch(setUser(data));
-      router.push('/');
-    } else {
-      const errorData = await response.json();
-      console.log('Error logging in user:', errorData);
+      if (response.ok) {
+        const data = await response.json();
+        console.log('user logged in!', data);
+        dispatch(setUser(data));
+        localStorage.setItem('user', JSON.stringify(data));
+        router.push('/');
+      } else {
+        const errorData = await response.json();
+        console.error('Error logging in:', errorData.error);
+      }
+    } catch (error) {
+      console.error('Failed to login:', error);
     }
   };
 
@@ -82,6 +90,14 @@ export default function Login() {
           <Button colorScheme='blue' type='submit' width='full'>
             Login
           </Button>
+          <Text mt={2} textAlign='center'>
+            Don't have an account?{' '}
+            <Link href='/signup'>
+              <Button variant='link' colorScheme='blue'>
+                Sign Up
+              </Button>
+            </Link>
+          </Text>
         </VStack>
       </form>
     </Box>
