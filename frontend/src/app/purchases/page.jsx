@@ -25,8 +25,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchAllPurchases } from '../redux/slices/purchaseSlice';
 import Image from 'next/image';
-import hb from '../components/media/hb.png';
-import hbaby from '../components/media/hbaby.png';
+import inventoryLogo from '../components/media/inventory.png';
 import Link from 'next/link'; 
 import Tilt from 'react-parallax-tilt';
 import { NavMenu } from '../components/NavMenu';
@@ -265,10 +264,11 @@ export default function Purchases() {
 
   return(
   <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
-    <div className='flex items-center justify-center'>
-      <Link href="/">
-        <Image src={hb} alt='logo' width={300} height={300} />
-      </Link>
+    <div id='headerText' className='flex justify-center h-[200px]'>
+        <Link href="/">
+          {/* <Image src={hb} alt='logo' width={300} height={300} /> */}
+          <h1 style={{ fontFamily: 'zombriya', fontSize: '42px', fontWeight: 'bold', textAlign: 'center' }} className='text-black dark:text-white'>INVENTORY TRACKER</h1>
+        </Link>
     </div>
     <div className='w-[90%] mx-auto'>
       <Heading mb={6} className='text-black dark:text-white transition-colors duration-200'>
@@ -586,9 +586,9 @@ export default function Purchases() {
         <CartModal activeCart={activeCart || { products: [] }} />
         <NavMenu />
         <Tilt>
-          <Box display="flex" justifyContent="center" mb={4}>
+        <Box display="flex" justifyContent="center" mt="48px">
             <Link href="/">
-              <Image src={hbaby} alt='logo' width={300} height={300} />
+              <Image src={inventoryLogo} alt='logo' width={300} height={300} />
             </Link>
           </Box>
         </Tilt>

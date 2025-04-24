@@ -3,9 +3,6 @@ import React, { useEffect, useState } from 'react';
 import {
   Box,
   Text,
-  VStack,
-  HStack,
-  IconButton,
   Heading,
   Card,
   CardBody,
@@ -13,7 +10,6 @@ import {
   Button,
   useToast,
 } from '@chakra-ui/react';
-import { FaTrash } from 'react-icons/fa';
 import {
   getAllCarts,
   removeCart,
@@ -29,13 +25,12 @@ import {
 import { fetchAllProducts } from '../redux/slices/productsSlice';
 import { useDispatch, useSelector } from 'react-redux';
 import Image from 'next/image';
-import hb from '../components/media/hb.png';
 import Link from 'next/link';
 import { CartModal } from '../components/CartModal';
 import { NavMenu } from '../components/NavMenu';
 import { CartsLoadingState } from '../components/LoadingStates/CartsLoadingState';
 import Tilt from 'react-parallax-tilt';
-import hbaby from '../components/media/hbaby.png';
+import inventoryLogo from '../components/media/inventory.png';
 
 export default function Cart() {
   const [pageLoading, setPageLoading] = useState(true);
@@ -317,10 +312,11 @@ export default function Cart() {
 
   return (
     <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
-      <div className='flex items-center justify-center'>
-        <Link href="/">
-          <Image src={hb} alt='logo' width={300} height={300} />
-        </Link>
+      <div id='headerText' className='flex items-center justify-center h-[200px]'>
+          <Link href="/">
+            {/* <Image src={hb} alt='logo' width={300} height={300} /> */}
+            <h1 style={{ fontFamily: 'zombriya', fontSize: '42px', fontWeight: 'bold', textAlign: 'center' }} className='text-black dark:text-white'>INVENTORY TRACKER</h1>
+          </Link>
       </div>
       <div className='w-[90%] mx-auto'>
         <Heading mb={4} className='text-black dark:text-white transition-colors duration-200'>Shopping Carts</Heading>
@@ -378,10 +374,10 @@ export default function Cart() {
       <CartModal activeCart={activeCart || { products: [] }} />
       <NavMenu />
       <Tilt>
-        <Box display="flex" justifyContent="center" mb={4}>
-          <Link href="/">
-            <Image src={hbaby} alt='logo' width={300} height={300} />
-          </Link>
+        <Box display="flex" justifyContent="center" mt="48px">
+            <Link href="/">
+              <Image src={inventoryLogo} alt='logo' width={300} height={300} />
+            </Link>
         </Box>
       </Tilt>
     </div>

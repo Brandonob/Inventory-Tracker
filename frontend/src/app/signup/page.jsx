@@ -58,7 +58,7 @@ export default function SignUp() {
         const data = await response.json();
         console.log('user signed up!', data);
         dispatch(setUser(data));
-        localStorage.setItem('user', JSON.stringify(data));
+        localStorage.setItem('inventoryTracker_user', JSON.stringify(data));
         toast({
           title: 'Account created.',
           description: "We've created your account for you.",

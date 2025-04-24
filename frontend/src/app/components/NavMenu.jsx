@@ -22,7 +22,7 @@ export const NavMenu = () => {
   const toast = useToast();
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
+    localStorage.removeItem('inventoryTracker_user');
     dispatch(clearUser());
 
     toast({
@@ -95,21 +95,6 @@ export const NavMenu = () => {
                 >
                   Logout
                 </MenuItem>
-                <MenuItem
-                  as='button'
-                  onClick={() => dispatch(toggleTheme())}
-                  {...menuItemStyles}
-                >
-                  {darkMode ? (
-                    <div className="flex items-center">
-                      <FaSun className="mr-2" /> Light Mode
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      <FaMoon className="mr-2" /> Dark Mode
-                    </div>
-                  )}
-                </MenuItem>
               </>
             ) : (
               <MenuItem
@@ -121,6 +106,21 @@ export const NavMenu = () => {
                 Login
               </MenuItem>
             )}
+            <MenuItem
+              as='button'
+              onClick={() => dispatch(toggleTheme())}
+              {...menuItemStyles}
+            >
+              {darkMode ? (
+                <div className="flex items-center">
+                  <FaSun className="mr-2" /> Light Mode
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <FaMoon className="mr-2" /> Dark Mode
+                </div>
+              )}
+            </MenuItem>
           </MenuList>
         </Menu>
       </div>

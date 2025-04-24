@@ -1,58 +1,62 @@
-import { getDB } from '../../../../lib/db';
+import { getDB } from '../../../../../lib/db';
 import { ObjectId } from 'mongodb';
-import { store } from '../../redux/store';
-export default async function handler(req, res) {
+import { NextResponse } from 'next/server';
+
+export async function PUT(req, { params }) {
   const db = await getDB();
-  const { id } = req.query; // Get the ID from the URL
+  console.log('>>>Request Object<<<', req); // Log the entire request object
+  const { id } = params; // Extract id from params object
+  console.log('>>>ID<<<', id);
 
-  if (req.method === 'PUT') {
-    try {
-      const { name, description, price, quantity, image } = req.body;
+  try {
+    const body = await req.json(); // Need to parse the JSON body
+    const { name, description, price, quantity, image } = body;
 
-      const product = await db
-        .collection('products')
-        .findOne({ _id: ObjectId.createFromHexString(id) });
+    const product = await db
+      .collection('products')
+      .findOne({ _id: ObjectId.createFromHexString(id) });
 
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
-
-      const updatedProduct = {
-        name,
-        description,
-        price,
-        quantity,
-        image,
-      };
-
-      await db
-        .collection('products')
-        .updateOne(
-          { _id: ObjectId.createFromHexString(id) },
-          { $set: updatedProduct }
-        );
-
-      res.status(200).json({ message: 'Product updated successfully' });
-    } catch (error) {
-      console.error('Error updating product:', error);
-      res.status(500).json({ error: 'Failed to update product' });
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
+
+    const updatedProduct = {
+      name,
+      description,
+      price,
+      quantity,
+      image,
+    };
+
+    await db
+      .collection('products')
+      .updateOne(
+        { _id: ObjectId.createFromHexString(id) },
+        { $set: updatedProduct }
+      );
+
+    return NextResponse.json({ message: 'Product updated successfully' });
+  } catch (error) {
+    console.error('Error updating product:', error);
+    return NextResponse.json({ error: 'Failed to update product' }, { status: 500 });
   }
+}
 
-  // Optionally add GET method to fetch single product
-  if (req.method === 'GET') {
-    try {
-      const product = await db
-        .collection('products')
-        .findOne({ _id: ObjectId.createFromHexString(id) });
+export async function GET(req, { params }) {
+  const db = await getDB();
+  const { id } = params; // Extract id from params object
 
-      if (!product) {
-        return res.status(404).json({ error: 'Product not found' });
-      }
+  try {
+    const product = await db
+      .collection('products')
+      .findOne({ _id: ObjectId.createFromHexString(id) });
 
-      res.status(200).json(product);
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch product' });
+    if (!product) {
+      return NextResponse.json({ error: 'Product not found' }, { status: 404 });
     }
+
+    return NextResponse.json(product);
+  } catch (error) {
+    return NextResponse.json({ error: 'Failed to fetch product' }, { status: 500 });
   }
 }

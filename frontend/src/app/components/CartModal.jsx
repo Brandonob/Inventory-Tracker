@@ -119,7 +119,7 @@ export const CartModal = ({ activeCart }) => {
                   <ModalBody className='max-h-[485px] overflow-y-auto'>
                     <VStack border={'1px solid white'} padding={'16px'} borderRadius={'6px'} spacing={4} align='stretch'>
                       {!activeCart?.products?.length ? (
-                        <Text textColor='white'>Your cart is empty</Text>
+                        <Text className='text-black dark:text-white'>Your cart is empty</Text>
                       ) : (
                         activeCart.products.map((cartItem) => (
                           <HStack
@@ -136,9 +136,9 @@ export const CartModal = ({ activeCart }) => {
                               borderRadius='md'
                               border={'1px solid lightgray'}
                             />
-                            <Text   flex={1} textColor='white'>{`${cartItem.product.name} - ${cartItem.product.description}`}</Text>
+                            <Text className='flex-1 text-black dark:text-white'>{`${cartItem.product.name} - ${cartItem.product.description}`}</Text>
                             {console.log('cartItem', cartItem)}
-                            <Text fontWeight='bold' textColor='white'>
+                            <Text className='font-bold text-black dark:text-white'>
                               ${cartItem.product.price * cartItem.quantity}
                             </Text>
                             <QuantitySelector cartItem={cartItem} />
@@ -149,7 +149,7 @@ export const CartModal = ({ activeCart }) => {
                   </ModalBody>
 
                   <ModalFooter>
-                    <Text mr={4} fontWeight="bold" textColor='white'>
+                    <Text mr={4} className='font-bold text-black dark:text-white'>
                       Total: ${calculateCartTotal().toFixed(2)}
                     </Text>
                     {user?.isAdmin && (

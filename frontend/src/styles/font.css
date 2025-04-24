@@ -1,0 +1,10 @@
+@font-face {
+    font-family: 'zombriya';
+    src: url('/fonts/zombriya-eye-fs.otf/zombriya.otf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+  }
+  
+  body {
+    font-family: 'zombriya', Arial, sans-serif;
+  }

@@ -59,7 +59,7 @@ export const QuantitySelector = ({ cartItem }) => {
       <Button borderRadius={'50%'} onClick={handleDecrement} {...decrement}>
         -
       </Button>
-      <Input width={'40px'} {...input} />
+      <Input width={'50px'} {...input} />
       <Button borderRadius={'50%'} onClick={handleIncrement} {...increment}>
         +
       </Button>

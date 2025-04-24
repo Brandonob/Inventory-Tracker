@@ -49,6 +49,7 @@ export default function RootLayout({ children }) {
     <html lang='en'>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white dark:bg-black transition-colors duration-200`}
+        // style={{ fontFamily: "'zombriya', Arial, sans-serif" }}
       >
         <ReduxProvider>
           <ThemeInitializer />

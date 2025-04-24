@@ -4,8 +4,7 @@ import { ButtonLoadingState } from './ButtonLoadingState';
 import { NavMenuLoadingState } from './NavMenuLoadingState';
 import { ProductCardLoadingState } from '../ProductCardLoadingState';
 import Image from 'next/image';
-import hb from '../media/hb.png';
-import hbaby from '../media/hbaby.png';
+import inventoryLogo from '../media/inventory.png';
 import Link from 'next/link';
 import Tilt from 'react-parallax-tilt';
 
@@ -14,9 +13,10 @@ export const HomeLoadingState = () => {
     <div className='flex flex-col items-center justify-center min-h-screen bg-white dark:bg-black transition-colors duration-200'>
       <NavMenuLoadingState />
       
-      <div className='flex items-center justify-center'>
+      <div className='flex items-center justify-center h-[200px]'>
         <Link href="/">
-          <Image src={hb} alt='logo' width={300} height={300} />
+          {/* <Image src={hb} alt='logo' width={300} height={300} /> */}
+          <h1 style={{ fontFamily: 'zombriya', fontSize: '42px', fontWeight: 'bold', textAlign: 'center' }} className='text-black dark:text-white'>INVENTORY TRACKER</h1>
         </Link>
       </div>
 
@@ -35,9 +35,9 @@ export const HomeLoadingState = () => {
       </div>
 
       <Tilt>
-        <Box display="flex" justifyContent="center" mb={4}>
+        <Box display="flex" justifyContent="center" mt="48px">
           <Link href="/">
-            <Image src={hbaby} alt='logo' width={300} height={300} />
+            <Image src={inventoryLogo} alt='logo' width={300} height={300} />
           </Link>
         </Box>
       </Tilt>

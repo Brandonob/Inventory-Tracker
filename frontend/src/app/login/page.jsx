@@ -42,7 +42,7 @@ export default function Login() {
         const data = await response.json();
         console.log('user logged in!', data);
         dispatch(setUser(data));
-        localStorage.setItem('user', JSON.stringify(data));
+        localStorage.setItem('inventoryTracker_user', JSON.stringify(data));
         router.push('/');
       } else {
         const errorData = await response.json();

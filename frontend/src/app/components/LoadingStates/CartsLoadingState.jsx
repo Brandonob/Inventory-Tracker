@@ -10,10 +10,9 @@ import {
   Stack
 } from '@chakra-ui/react';
 import Image from 'next/image';
-import hb from '../media/hb.png';
+import inventoryLogo from '../media/inventory.png';
 import Link from 'next/link';
 import { NavMenuLoadingState } from './NavMenuLoadingState';
-import hbaby from '../media/hbaby.png';
 import Tilt from 'react-parallax-tilt';
 
 const CartCardLoadingState = () => (
@@ -40,9 +39,10 @@ const CartCardLoadingState = () => (
 export const CartsLoadingState = () => {
   return (
     <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
-      <div className='flex items-center justify-center'>
+      <div className='flex items-center justify-center h-[200px]'>
         <Link href="/">
-          <Image src={hb} alt='logo' width={300} height={300} />
+          {/* <Image src={hb} alt='logo' width={300} height={300} /> */}
+          <h1 style={{ fontFamily: 'zombriya', fontSize: '42px', fontWeight: 'bold', textAlign: 'center' }} className='text-black dark:text-white'>INVENTORY TRACKER</h1>
         </Link>
       </div>
 
@@ -59,9 +59,9 @@ export const CartsLoadingState = () => {
 
       <NavMenuLoadingState />
       <Tilt>
-        <Box display="flex" justifyContent="center" mb={4}>
+        <Box display="flex" justifyContent="center" mt="48px">
           <Link href="/">
-            <Image src={hbaby} alt='logo' width={300} height={300} />
+            <Image src={inventoryLogo} alt='logo' width={300} height={300} />
           </Link>
         </Box>
       </Tilt>

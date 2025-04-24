@@ -10,16 +10,19 @@ export const localStorageMiddleware = store => next => action => {
     // Save both cart and user state after every action
     const cartState = store.getState().carts;
     const userState = store.getState().users;
+    const themeState = store.getState().theme;
 
-    localStorage.setItem('cartState', JSON.stringify({
+    localStorage.setItem('inventoryTracker_cartState', JSON.stringify({
       activeCart: cartState.activeCart,
       activeCartId: cartState.activeCartId,
       activeCartName: cartState.activeCartName
     }));
 
-    localStorage.setItem('userState', JSON.stringify({
+    localStorage.setItem('inventoryTracker_userState', JSON.stringify({
       user: userState.user
     }));
+
+    localStorage.setItem('inventoryTracker_theme', themeState.darkMode ? 'dark' : 'light');
   } catch (err) {
     console.error('Error saving state to localStorage:', err);
   }
@@ -35,8 +38,8 @@ export const loadState = () => {
       return undefined;
     }
     
-    const cartState = localStorage.getItem('cartState');
-    const userState = localStorage.getItem('userState');
+    const cartState = localStorage.getItem('inventoryTracker_cartState');
+    const userState = localStorage.getItem('inventoryTracker_userState');
     
     return {
       carts: cartState ? JSON.parse(cartState) : undefined,

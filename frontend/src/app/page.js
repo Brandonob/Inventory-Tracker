@@ -5,7 +5,7 @@ import { ProductCard } from './components/ProductCard';
 import { fetchAllProducts } from './redux/slices/productsSlice';
 import { useSelector, useDispatch } from 'react-redux';
 import Image from 'next/image';
-import hb from './components/media/hb.png';
+import inventoryLogo from './components/media/inventory.png';
 import hbaby from './components/media/hbaby.png';
 import { Box } from '@chakra-ui/react';
 import { InitializeDB } from './utils/InitializeDB';
@@ -18,6 +18,7 @@ import { NewCartButton } from './components/NewCartButton';
 import Tilt from 'react-parallax-tilt';
 import { ProductCardLoadingState } from './components/ProductCardLoadingState';
 import { HomeLoadingState } from './components/LoadingStates/HomeLoadingState';
+import './globals.css';
 
 export default function Home() {
   const [pageLoading, setPageLoading] = useState(true);
@@ -75,9 +76,10 @@ export default function Home() {
     <>
       <InitializeDB />
       <div className='flex flex-col items-center justify-center bg-white dark:bg-black min-h-screen transition-colors duration-200'>
-        <div className='flex items-center justify-center'>
+        <div id='headerText' className='flex items-center justify-center h-[200px]'>
           <Link href="/">
-            <Image src={hb} alt='logo' width={300} height={300} />
+            {/* <Image src={hb} alt='logo' width={300} height={300} /> */}
+            <h1 style={{ fontFamily: 'zombriya', fontSize: '42px', fontWeight: 'bold', textAlign: 'center' }} className='text-black dark:text-white'>INVENTORY TRACKER</h1>
           </Link>
         </div>
         <div className='flex flex-col w-3/4'>
@@ -92,18 +94,22 @@ export default function Home() {
           <div className='bg-white dark:bg-gray-800 rounded-3xl mt-12 transition-colors duration-200'>
             <div className='flex flex-wrap gap-4 justify-center rounded-3xl bg-[rgb(90,103,250)]/80 p-8 
               shadow-2xl backdrop-blur-sm transition-all duration-300 hover:shadow-[rgb(90,103,250)]/50'>
-              {productsInStock.map((product) => (
-                <ProductCard key={product._id} product={product} />
-              ))}
+              {productsInStock.length === 0 ? (
+                <p className='text-center text-white'>No products in stock. Add products to get started!</p>
+              ) : (
+                productsInStock.map((product) => (
+                  <ProductCard key={product._id} product={product} />
+                ))
+              )}
             </div>
           </div>
         </div>
         <CartModal activeCart={activeCart || { products: [] }} />
         <NavMenu />
         <Tilt>
-          <Box display="flex" justifyContent="center" mb={4}>
+          <Box display="flex" justifyContent="center" mt="48px">
             <Link href="/">
-              <Image src={hbaby} alt='logo' width={300} height={300} />
+              <Image src={inventoryLogo} alt='logo' width={300} height={300} />
             </Link>
           </Box>
         </Tilt>

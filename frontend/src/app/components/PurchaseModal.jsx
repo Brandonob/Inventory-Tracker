@@ -69,7 +69,7 @@ export const PurchaseModal = ({ handleBackToCart, activeCart, calculateCartTotal
         await updateProductStock(activeCart.products);
       }
       dispatch(clearActiveCart());
-      localStorage.removeItem('cartState');
+      localStorage.removeItem('inventoryTracker_cartState');
       //set all modals to close
       handleBackToCart();
       //close cart modal

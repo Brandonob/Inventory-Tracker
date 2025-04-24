@@ -92,7 +92,7 @@ export function NewCartButton() {
       }}
       margin='15px 30px'
       position='relative'
-      zIndex={1}
+      zIndex='auto'
       color='white'
       cursor='pointer'
       transition='box-shadow 0.2s'
